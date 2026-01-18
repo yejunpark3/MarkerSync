@@ -10,7 +10,7 @@ extension ARManager {
 
         switch await activity.prepareForActivation() {
         case .activationPreferred:
-            try await activity.activate()
+            _ = try await activity.activate()
             appState = .waitingForHost
             userRole = .undetermined
 
@@ -67,6 +67,9 @@ extension ARManager {
                     case .invalidated:
                         self.isConnected = false
                         self.handleSessionInvalidation()
+
+                    @unknown default:
+                        break
                     }
                 }
             }
