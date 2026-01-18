@@ -11,5 +11,11 @@
 		<key>UISceneConfigurations</key>
 		<dict/>
 	</dict>
+	<key>NSWorldSensingUsageDescription</key>
+	<string>공간 매핑과 앵커 공유를 위해 필요합니다</string>
+	<key>NSCameraUsageDescription</key>
+	<string>2D 마커 인식을 위해 카메라 접근이 필요합니다</string>
+	<key>NSSupportsGroupActivities</key>
+	<true/>
 </dict>
 </plist>

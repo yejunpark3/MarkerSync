@@ -9,32 +9,25 @@ import SwiftUI
 
 @main
 struct MarkerSyncApp: App {
-    
-    @State private var appModel = AppModel()
-    @State private var avPlayerViewModel = AVPlayerViewModel()
-    
+    @State private var arManager = ARManager()
+
     var body: some Scene {
         WindowGroup {
-            if avPlayerViewModel.isPlaying {
-                AVPlayerView(viewModel: avPlayerViewModel)
-            } else {
-                ContentView()
-                    .environment(appModel)
-            }
+            ContentView()
+                .environment(arManager)
         }
-        
-        ImmersiveSpace(id: appModel.immersiveSpaceID) {
-            ImmersiveView()
-                .environment(appModel)
-                .onAppear {
-                    appModel.immersiveSpaceState = .open
-                    avPlayerViewModel.play()
-                }
-                .onDisappear {
-                    appModel.immersiveSpaceState = .closed
-                    avPlayerViewModel.reset()
-                }
+        // .groupActivityAssociation(ARCollaborationActivity.self)  // Not available in this SDK version
+
+        ImmersiveSpace(id: "tracking") {
+            MarkerTrackingView()
+                .environment(arManager)
         }
-        .immersionStyle(selection: .constant(.full), in: .full)
+        .immersionStyle(selection: .constant(.mixed), in: .mixed)
+
+        ImmersiveSpace(id: "model") {
+            ModelDisplayView()
+                .environment(arManager)
+        }
+        .immersionStyle(selection: .constant(.mixed), in: .mixed)
     }
 }
