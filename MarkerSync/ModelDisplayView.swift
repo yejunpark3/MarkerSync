@@ -6,16 +6,19 @@ import ARKit
 struct ModelDisplayView: View {
     @Environment(ARManager.self) var arManager
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
-    
+
     // MARK: - State
     @State private var modelEntities: [UUID: Entity] = [:]
     @State private var selectedAnchorId: UUID?
     @State private var connectionLost = false
     @State private var isLoadingModel = false
     @State private var loadError: String?
-    @State private var showDebugInfo = false
+    @State private var showDebugInfo = true
     @State private var lastDriftDistance: Float = 0
     @State private var totalDriftCorrections: Int = 0
+
+    // MARK: - Debug Manager
+    @State private var debugManager = DebugElementManager()
     
     var body: some View {
         ZStack {

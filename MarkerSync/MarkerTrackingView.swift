@@ -6,13 +6,16 @@ struct MarkerTrackingView: View {
     @Environment(ARManager.self) var arManager
     @Environment(\.openImmersiveSpace) var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
-    
+
     // MARK: - Local State
     @State private var detectedAnchor: ImageAnchor?
     @State private var currentBoxEntity: Entity?
     @State private var attachmentAdded = false
     @State private var isCreatingAnchor = false
-    @State private var showDebugInfo = false
+    @State private var showDebugInfo = true
+
+    // MARK: - Debug Manager
+    @State private var debugManager = DebugElementManager()
     
     var body: some View {
         RealityView { content, attachments in
