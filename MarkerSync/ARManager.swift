@@ -73,6 +73,10 @@ class ARManager {
         do {
             try await requestAuthorization()
             try await setupProviders()
+
+            // 기존 영구 저장된 anchor 정리 (Host/Guest 모두)
+            await cleanupPersistedAnchors()
+            
             observeGroupSessions()
             startWorldAnchorObservation()
             

@@ -92,6 +92,11 @@ extension ARManager {
     
     /// 추적 중인 마커 처리 (Phase 4-6)
     private func processTrackedAnchor(_ anchor: ImageAnchor) {
+        // 이미 완료된 상태면 처리하지 않음
+        guard trackingStatus != .found && trackingStatus != .anchored else {
+            return
+        }
+
         currentImageAnchor = anchor
         let transform = anchor.originFromAnchorTransform
         
@@ -201,6 +206,50 @@ extension ARManager {
             }
         }
     }
+
+    // MARK: - Cleanup Persisted Anchors
+
+    /// 앱 시작 시 기존 영구 저장된 World Anchor 모두 삭제
+    func cleanupPersistedAnchors() async {
+        guard let worldTracking = worldTracking else {
+            print("⚠️ WorldTracking not available for cleanup")
+            return
+        }
+        
+        print("🧹 Cleaning up persisted anchors...")
+        
+        var removedCount = 0
+        
+        // 타임아웃이 있는 Task로 감싸기
+        let cleanupTask = Task {
+            for await update in worldTracking.anchorUpdates {
+                if Task.isCancelled { break }
+                
+                if update.event == .added {
+                    do {
+                        try await worldTracking.removeAnchor(forID: update.anchor.id)
+                        removedCount += 1
+                        print("🗑️ Removed persisted anchor: \(update.anchor.id)")
+                    } catch {
+                        print("❌ Failed to remove anchor \(update.anchor.id): \(error)")
+                    }
+                }
+            }
+        }
+        
+        // 1초 후 강제 종료
+        try? await Task.sleep(for: .seconds(1))
+        cleanupTask.cancel()
+        
+        // sharedAnchors 딕셔너리도 초기화
+        sharedAnchors.removeAll()
+        
+        if removedCount > 0 {
+            print("🧹 Cleanup complete: removed \(removedCount) anchors")
+        } else {
+            print("✅ No persisted anchors to clean up")
+        }
+    }
     
     // MARK: - Create World Anchor (Phase 7)
     
@@ -220,13 +269,16 @@ extension ARManager {
         guard result.isStable else {
             throw ARError.positionUnstable(variance: result.positionVariance)
         }
-        
-        // WorldAnchor 생성
-        let worldAnchor = WorldAnchor(originFromAnchorTransform: result.averageTransform)
-        
+
         guard let worldTracking = worldTracking else {
             throw ARError.worldTrackingUnavailable
         }
+        
+        // 기존 anchor 정리 (새로 만들기 전에)
+        await cleanupPersistedAnchors()
+        
+        // WorldAnchor 생성
+        let worldAnchor = WorldAnchor(originFromAnchorTransform: result.averageTransform)
         
         print("🎯 Creating WorldAnchor at averaged position...")
         try await worldTracking.addAnchor(worldAnchor)

@@ -8,26 +8,13 @@
 def Xform "Root"
 {
     reorder nameChildren = ["Sphere_Left", "Sphere_Right", "GridMaterial"]
-    def Cube "Cube" (
+    def "Leopard_2A6_Free" (
         active = true
-        prepend apiSchemas = ["MaterialBindingAPI"]
+        prepend references = @Leopard_2A6_Free.usdz@
     )
     {
-        rel material:binding = </Root/Cube/DefaultMaterial>
-        double size = 0.2
-
-        def Material "DefaultMaterial"
-        {
-            prepend token outputs:surface.connect = </Root/Cube/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
-
-            def Shader "DefaultSurfaceShader"
-            {
-                uniform token info:id = "UsdPreviewSurface"
-                color3f inputs:diffuseColor = (1, 1, 1)
-                float inputs:roughness = 0.75
-                token outputs:surface
-            }
-        }
+        float3 xformOp:scale = (0.0025, 0.0025, 0.0025)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
     }
 }
 
