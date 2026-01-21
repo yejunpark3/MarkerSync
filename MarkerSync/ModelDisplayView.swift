@@ -14,6 +14,7 @@ struct ModelDisplayView: View {
     @State private var isLoadingModel = false
     @State private var loadError: String?
     @State private var showDebugInfo = true
+    @State private var showExplanation = true
     @State private var lastDriftDistance: Float = 0
     @State private var totalDriftCorrections: Int = 0
 
@@ -22,15 +23,21 @@ struct ModelDisplayView: View {
     
     var body: some View {
         ZStack {
-            RealityView { content in
+            RealityView { content, attachments in
                 // 초기 설정 - 디버그 참조 오브젝트
                 if showDebugInfo {
                     addDebugReferenceObjects(to: content)
                 }
-            } update: { content in
-                updateModels(in: content)
+            } update: { content, attachments in
+                updateModels(in: content, attachments: attachments)
+            } attachments: {
+                Attachment(id: "explanationWindow") {
+                    if showExplanation {
+                        TankExplanationView()
+                    }
+                }
             }
-            
+
             // 상태 오버레이
             statusOverlay
         }
@@ -101,6 +108,19 @@ struct ModelDisplayView: View {
                     totalCorrections: totalDriftCorrections
                 )
             }
+
+            Button(action: {
+                showExplanation.toggle()
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: showExplanation ? "info.circle.fill" : "info.circle")
+                    Text(showExplanation ? "정보 숨기기" : "정보 보기")
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
         }
         .padding(.bottom, 50)
         
@@ -152,7 +172,7 @@ struct ModelDisplayView: View {
     
     // MARK: - Model Management
     
-    private func updateModels(in content: RealityViewContent) {
+    private func updateModels(in content: RealityViewContent, attachments: RealityViewAttachments) {
         // 선택된 앵커 확인
         guard let anchorId = selectedAnchorId,
               let anchorInfo = arManager.sharedAnchors[anchorId],
@@ -160,15 +180,23 @@ struct ModelDisplayView: View {
             removeAllModels(from: content)
             return
         }
-        
+
         let newTransform = Transform(matrix: anchorInfo.anchor.originFromAnchorTransform)
-        
+
         // 기존 모델이 있으면 Transform 업데이트 (Drift 보정)
         if let existingModel = modelEntities[anchorId] {
             existingModel.transform = newTransform
         } else {
             // 모델이 없으면 새로 로드
             loadModel(for: anchorId, anchorInfo: anchorInfo, content: content)
+        }
+
+        if let explanationAttachment = attachments.entity(for: "explanationWindow"),
+           let tankContainer = modelEntities[anchorId] {
+            if !tankContainer.children.contains(where: { $0.name == "explanationWindow" }) {
+                tankContainer.addChild(explanationAttachment)
+                configureExplanationAttachment(explanationAttachment)
+            }
         }
     }
     
@@ -292,6 +320,13 @@ struct ModelDisplayView: View {
         modelEntities.removeAll()
     }
     
+    private func configureExplanationAttachment(_ attachment: Entity) {
+        attachment.name = "explanationWindow"
+        attachment.position = [0, 0.7, 0]
+
+        attachment.components.set(BillboardComponent())
+    }
+
     // MARK: - Debug Helpers
     
     private func addDebugReferenceObjects(to content: RealityViewContent) {
