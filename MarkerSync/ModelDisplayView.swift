@@ -15,6 +15,10 @@ struct ModelDisplayView: View {
     @State private var loadError: String?
     @State private var showDebugInfo = true
     @State private var showExplanation = true
+    @State private var showControlPanel = true
+    @State private var currentColor: TankColor = .desertTan
+    @State private var currentOptions: TankOptions = TankOptions()
+    @State private var isHost: Bool = true
     @State private var lastDriftDistance: Float = 0
     @State private var totalDriftCorrections: Int = 0
 
@@ -34,6 +38,16 @@ struct ModelDisplayView: View {
                 Attachment(id: "explanationWindow") {
                     if showExplanation {
                         TankExplanationView()
+                    }
+                }
+
+                Attachment(id: "controlPanel") {
+                    if showControlPanel {
+                        ControlPanelView(
+                            isHost: isHost,
+                            currentColor: $currentColor,
+                            currentOptions: $currentOptions
+                        )
                     }
                 }
             }
@@ -117,6 +131,15 @@ struct ModelDisplayView: View {
                     Text(showExplanation ? "정보 숨기기" : "정보 보기")
                 }
             }
+
+            Button(action: {
+                showControlPanel.toggle()
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: showControlPanel ? "slider.horizontal.3" : "slider.horizontal.3")
+                    Text(showControlPanel ? "제어 숨기기" : "제어 보기")
+                }
+            }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(.ultraThinMaterial)
@@ -196,6 +219,14 @@ struct ModelDisplayView: View {
             if !tankContainer.children.contains(where: { $0.name == "explanationWindow" }) {
                 tankContainer.addChild(explanationAttachment)
                 configureExplanationAttachment(explanationAttachment)
+            }
+        }
+
+        if let controlPanel = attachments.entity(for: "controlPanel"),
+           let tankContainer = modelEntities[anchorId] {
+            if !tankContainer.children.contains(where: { $0.name == "controlPanel" }) {
+                tankContainer.addChild(controlPanel)
+                configureControlPanel(controlPanel)
             }
         }
     }
@@ -323,6 +354,13 @@ struct ModelDisplayView: View {
     private func configureExplanationAttachment(_ attachment: Entity) {
         attachment.name = "explanationWindow"
         attachment.position = [0, 0.7, 0]
+
+        attachment.components.set(BillboardComponent())
+    }
+
+    private func configureControlPanel(_ attachment: Entity) {
+        attachment.name = "controlPanel"
+        attachment.position = [-1.0, 1.0, 0]
 
         attachment.components.set(BillboardComponent())
     }
