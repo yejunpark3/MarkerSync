@@ -35,7 +35,16 @@ class ARManager {
     var session = ARKitSession()
     var worldTracking: WorldTrackingProvider?
     var imageTracking: ImageTrackingProvider?
-    
+
+    // MARK: - Hand Tracking Components
+    var handTracking: HandTrackingProvider?
+    var handTrackingTask: Task<Void, Never>?
+
+    // MARK: - Gesture State
+    var handsData: HandsData = HandsData()
+    var gestureDetectionState: GestureDetectionState = .notTracking
+    var lastGestureTime: Date?
+
     // MARK: - SharePlay Components
     var groupSession: GroupSession<ARCollaborationActivity>?
     var subscriptions = Set<AnyCancellable>()
@@ -76,10 +85,24 @@ class ARManager {
 
             // 기존 영구 저장된 anchor 정리 (Host/Guest 모두)
             await cleanupPersistedAnchors()
-            
+
             observeGroupSessions()
             startWorldAnchorObservation()
-            
+
+            // Start monitoring loops for tracking (providers already running from setupProviders)
+            do {
+                try await startImageTracking()  // Start the monitoring task
+            } catch {
+                print("⚠️ Image tracking monitoring unavailable: \(error)")
+            }
+
+            do {
+                try await startHandTracking()  // Start the monitoring task
+            } catch {
+                print("⚠️ Hand tracking monitoring unavailable: \(error)")
+                // Non-fatal - continue without gesture detection
+            }
+
             appState = .waitingForSharePlay
             print("✅ ARManager initialized successfully")
         } catch let error as ARError {
@@ -119,25 +142,38 @@ class ARManager {
     /// Setup WorldTracking and ImageTracking providers
     func setupProviders() async throws {
         print("🔧 Setting up AR providers...")
-        
+
         // WorldTracking (shared anchors enabled by default in visionOS)
         worldTracking = WorldTrackingProvider()
-        
+
         // ImageTracking with reference images
         let refImages = ReferenceImage.loadReferenceImages(inGroupNamed: "AR Resources")
         print("📷 Loaded \(refImages.count) reference images")
         imageTracking = ImageTrackingProvider(referenceImages: refImages)
-        
-        // Start session with WorldTracking only
+
+        // HandTracking for heart gesture
+        handTracking = HandTrackingProvider()
+        print("✅ HandTracking provider initialized")
+
+        // Start session with ALL providers at once
         guard let worldTracking = worldTracking else {
             throw ARError.worldTrackingUnavailable
         }
-        
-        try await session.run([worldTracking])
+
+        // Build provider array with all available providers
+        var providers: [any DataProvider] = [worldTracking]
+        if let imageTracking = imageTracking {
+            providers.append(imageTracking)
+        }
+        if let handTracking = handTracking {
+            providers.append(handTracking)
+        }
+
+        try await session.run(providers)
         worldTrackingStartTime = Date()
-        
-        print("✅ WorldTracking provider started")
-        
+
+        print("✅ All providers started: WorldTracking, ImageTracking, HandTracking")
+
         // World Tracking 안정화 대기 시작
         startWorldTrackingStabilization()
     }
@@ -279,11 +315,13 @@ class ARManager {
         worldTrackingTask?.cancel()
         groupSessionTask?.cancel()
         stabilizationTask?.cancel()
-        
+        handTrackingTask?.cancel()
+
         imageTrackingTask = nil
         worldTrackingTask = nil
         groupSessionTask = nil
         stabilizationTask = nil
+        handTrackingTask = nil
         
         // SharePlay 정리
         groupSession?.leave()
@@ -299,7 +337,10 @@ class ARManager {
         resetSampling()
         isWorldTrackingStable = false
         worldTrackingStartTime = nil
-        
+
+        // 제스처 상태 초기화
+        gestureDetectionState = .notTracking
+
         print("✅ ARManager cleanup complete")
     }
     

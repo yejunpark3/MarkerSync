@@ -10,34 +10,34 @@ extension ARManager {
         guard let imageTracking = imageTracking else {
             throw ARError.imageTrackingUnavailable
         }
-        
+
         // 샘플링 상태 초기화
         resetSampling()
         trackingStatus = .searching
-        
+
         imageTrackingTask?.cancel()
-        
+
         print("🔍 Starting image tracking...")
-        
-        // ImageTracking을 세션에 추가
-        try await session.run([worldTracking!, imageTracking])
-        
+
+        // Note: ImageTracking provider is already running from setupProviders()
+        // No need to call session.run() again
+
         // World Tracking 안정화 대기
         trackingStatus = .stabilizing
         print("⏳ Waiting for World Tracking stabilization...")
-        
+
         try await waitForWorldTrackingStabilization()
-        
+
         trackingStatus = .searching
         print("✅ World Tracking stable, searching for marker...")
-        
+
         // Anchor 업데이트 모니터링 시작
         imageTrackingTask = Task { [weak self] in
             guard let self = self else { return }
-            
+
             for await update in imageTracking.anchorUpdates {
                 if Task.isCancelled { break }
-                
+
                 await MainActor.run {
                     self.handleImageAnchorUpdate(update)
                 }

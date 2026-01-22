@@ -171,7 +171,8 @@ enum ARError: LocalizedError {
     case positionOutOfRange(distance: Float)
     case heightOutOfRange(height: Float)
     case samplingTimeout
-    
+    case handTrackingUnavailable
+
     var errorDescription: String? {
         switch self {
         case .referenceImageLoadFailed:
@@ -200,6 +201,8 @@ enum ARError: LocalizedError {
             return String(format: "마커 높이가 범위를 벗어났습니다 (%.1fm)", height)
         case .samplingTimeout:
             return "위치 샘플링 시간이 초과되었습니다"
+        case .handTrackingUnavailable:
+            return "손 트래킹을 사용할 수 없습니다"
         }
     }
 }
@@ -306,4 +309,10 @@ enum PositionHint {
         
         return .none
     }
+}
+
+// MARK: - Gesture Notifications
+
+extension Notification.Name {
+    static let heartGestureDetected = Notification.Name("heartGestureDetected")
 }
