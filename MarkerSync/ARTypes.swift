@@ -314,5 +314,5 @@ enum PositionHint {
 // MARK: - Gesture Notifications
 
 extension Notification.Name {
-    static let heartGestureDetected = Notification.Name("heartGestureDetected")
+    static let palmUpGestureDetected = Notification.Name("palmUpGestureDetected")
 }

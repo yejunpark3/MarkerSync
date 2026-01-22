@@ -151,7 +151,7 @@ class ARManager {
         print("📷 Loaded \(refImages.count) reference images")
         imageTracking = ImageTrackingProvider(referenceImages: refImages)
 
-        // HandTracking for heart gesture
+        // HandTracking for palm-up gesture detection
         handTracking = HandTrackingProvider()
         print("✅ HandTracking provider initialized")
 

@@ -1,15 +1,14 @@
 import Foundation
 import ARKit
 
-// MARK: - Heart Gesture Configuration
+// MARK: - Palm-Up Gesture Configuration
 
-/// 하트 제스처 감지 설정
-enum HeartGestureConfig {
-    /// 손가락 간격 임계값 (4cm, HappyBeam 기준)
-    static let fingerDistanceThreshold: Float = 0.04
-
-    /// 제스처 감지 스무딩 윈도우 (프레임 수)
-    static let smoothingWindow: Int = 24
+/// 손바닥 위로 향하는 제스처 감지 설정 (오른손만)
+enum PalmUpGestureConfig {
+    /// 손바닥 방향 임계값 (dot product with up vector)
+    /// 1.0 = perfectly aligned, 0.0 = perpendicular, -1.0 = facing down
+    /// 0.7 corresponds to ~45° tolerance from perfectly upward
+    static let palmUpThreshold: Float = 0.7
 
     /// 로그 출력 간격 (초) - 로그 스팸 방지
     static let logThrottleInterval: TimeInterval = 0.5
@@ -30,7 +29,7 @@ enum GestureDetectionState: Equatable {
         case .searching:
             return "손 탐색 중..."
         case .detected:
-            return "❤️ 하트 제스처 감지됨"
+            return "🙌 손바닥 위로 제스처 감지됨"
         }
     }
 }
