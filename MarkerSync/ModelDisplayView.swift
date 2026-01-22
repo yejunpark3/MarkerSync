@@ -21,6 +21,7 @@ struct ModelDisplayView: View {
     @State private var isHost: Bool = true
     @State private var lastDriftDistance: Float = 0
     @State private var totalDriftCorrections: Int = 0
+    @State private var entityHeights: [UUID: Float] = [:]
 
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
@@ -214,19 +215,23 @@ struct ModelDisplayView: View {
             loadModel(for: anchorId, anchorInfo: anchorInfo, content: content)
         }
 
+        // Retrieve cached height for this anchor
+        let cachedHeight = entityHeights[anchorId]
+
         if let explanationAttachment = attachments.entity(for: "explanationWindow"),
            let tankContainer = modelEntities[anchorId] {
             if !tankContainer.children.contains(where: { $0.name == "explanationWindow" }) {
                 tankContainer.addChild(explanationAttachment)
-                configureExplanationAttachment(explanationAttachment)
+                configureExplanationAttachment(explanationAttachment, height: cachedHeight)
             }
         }
 
+        // Control panel configuration remains unchanged (lines 225-231)
         if let controlPanel = attachments.entity(for: "controlPanel"),
            let tankContainer = modelEntities[anchorId] {
             if !tankContainer.children.contains(where: { $0.name == "controlPanel" }) {
                 tankContainer.addChild(controlPanel)
-                configureControlPanel(controlPanel)
+                configureControlPanel(controlPanel)  // No height parameter
             }
         }
     }
@@ -253,7 +258,16 @@ struct ModelDisplayView: View {
                 model.name = "k2_tank_model"
                 
                 container.addChild(model)
-                
+
+                // Calculate entity height for dynamic positioning
+                if let modelEntity = container.findEntity(named: "k2_tank_model"),
+                   let height = calculateEntityHeight(modelEntity) {
+                    entityHeights[anchorId] = height
+                    print("✅ Cached height \(height)m for anchor: \(anchorId)")
+                } else {
+                    print("⚠️ Could not calculate height, will use fallback positioning")
+                }
+
                 // 디버그용 좌표축 추가
                 if showDebugInfo {
                     let axes = createCoordinateAxes()
@@ -287,7 +301,8 @@ struct ModelDisplayView: View {
                 arManager.unregisterEntity(for: anchorId)
             }
             modelEntities.removeAll()
-            
+            entityHeights.removeAll()
+
             if !arManager.sharedAnchors.isEmpty {
                 print("⚠️ All models removed - no active anchor selected")
             }
@@ -347,15 +362,20 @@ struct ModelDisplayView: View {
         for anchorId in modelEntities.keys {
             arManager.unregisterEntity(for: anchorId)
         }
-        
+
         modelEntities.removeAll()
+        entityHeights.removeAll()
     }
     
-    private func configureExplanationAttachment(_ attachment: Entity) {
+    private func configureExplanationAttachment(_ attachment: Entity, height: Float? = nil) {
         attachment.name = "explanationWindow"
-        attachment.position = [0, 0.7, 0]
+
+        let baseHeight = height ?? 0.7  // fallback to original value
+        attachment.position = [0, baseHeight * 1.2, 0]
 
         attachment.components.set(BillboardComponent())
+
+        print("📍 Explanation window positioned at y=\(baseHeight * 1.2)m")
     }
 
     private func configureControlPanel(_ attachment: Entity) {
@@ -363,6 +383,19 @@ struct ModelDisplayView: View {
         attachment.position = [-1.0, 1.0, 0]
 
         attachment.components.set(BillboardComponent())
+    }
+
+    private func calculateEntityHeight(_ entity: Entity) -> Float? {
+        let bounds = entity.visualBounds(relativeTo: nil)
+        let height = bounds.max.y - bounds.min.y
+
+        guard height > 0 else {
+            print("⚠️ Invalid bounding box height: \(height)")
+            return nil
+        }
+
+        print("📏 Calculated entity height: \(height)m")
+        return height
     }
 
     // MARK: - Debug Helpers
