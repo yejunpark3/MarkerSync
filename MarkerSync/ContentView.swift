@@ -28,7 +28,7 @@ struct ContentView: View {
             // 하단 상태 바
             bottomStatusBar
         }
-        .frame(minWidth: 400, minHeight: 350)
+        .frame(minWidth: 350, minHeight: 300)
         .task {
             await arManager.initialize()
         }
@@ -443,38 +443,69 @@ struct HostModeView: View {
 struct ViewingModelView: View {
     let anchorsCount: Int
     let userRole: UserRole
-    
+    @Environment(ARManager.self) var arManager
+
     var body: some View {
-        VStack(spacing: 24) {
-            ZStack {
-                Circle()
-                    .fill(Color.purple.opacity(0.1))
-                    .frame(width: 100, height: 100)
-                
-                Image(systemName: "cube.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(.purple)
-            }
-            
-            Text("3D 모델 표시 중")
-                .font(.title2)
-            
+        VStack(spacing: 16) {
+            // Compact header
             VStack(spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: "cube.fill")
+                        .font(.title3)
+                        .foregroundColor(.purple)
+                    Text("3D 모델 표시 중")
+                        .font(.headline)
+                }
+
                 HStack(spacing: 4) {
                     Image(systemName: "mappin.circle.fill")
                         .foregroundColor(.green)
-                    Text("\(anchorsCount)개의 앵커 활성화")
+                        .font(.caption)
+                    Text("\(anchorsCount)개 활성화")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
-                .font(.subheadline)
-                
-                Text(userRole == .host ? "Host로 참여 중" : "Participant로 참여 중")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
-            .padding()
-            .background(Color.purple.opacity(0.1))
-            .cornerRadius(12)
+
+            Divider()
+
+            // Control panel section
+            if userRole == .host {
+                VStack(spacing: 12) {
+                    // Color picker
+                    ColorPickerGrid(
+                        selection: Binding(
+                            get: { arManager.selectedTankColor },
+                            set: { arManager.selectedTankColor = $0 }
+                        ),
+                        colors: TankColor.allCases,
+                        isEnabled: true
+                    )
+
+                    // Options toggles
+                    OptionsControlView(
+                        options: Binding(
+                            get: { arManager.selectedTankOptions },
+                            set: { arManager.selectedTankOptions = $0 }
+                        ),
+                        isEnabled: true
+                    )
+                }
+            } else {
+                // Participant view-only mode
+                VStack(spacing: 8) {
+                    Image(systemName: "eye")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    Text("관람 모드")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxHeight: .infinity)
+            }
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 }
 

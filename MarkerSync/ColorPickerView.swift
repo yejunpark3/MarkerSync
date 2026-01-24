@@ -13,16 +13,22 @@ struct ColorPickerGrid: View {
     let isEnabled: Bool
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 16) {
-            ForEach(colors, id: \.self) { color in
-                ColorSwatch(
-                    color: color,
-                    isSelected: selection == color,
-                    isEnabled: isEnabled
-                )
-                .onTapGesture {
-                    if isEnabled {
-                        selection = color
+        VStack(alignment: .leading, spacing: 8) {
+            Text("색상 선택")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 12) {
+                ForEach(colors, id: \.self) { color in
+                    ColorSwatch(
+                        color: color,
+                        isSelected: selection == color,
+                        isEnabled: isEnabled
+                    )
+                    .onTapGesture {
+                        if isEnabled {
+                            selection = color
+                        }
                     }
                 }
             }
@@ -40,7 +46,7 @@ struct ColorSwatch: View {
             ZStack {
                 Circle()
                     .fill(color.uiColor)
-                    .frame(width: 60, height: 60)
+                    .frame(width: 50, height: 50)
                     .overlay(
                         Circle()
                             .strokeBorder(Color.white, lineWidth: isSelected ? 4 : 0)

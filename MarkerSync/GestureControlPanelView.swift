@@ -8,6 +8,9 @@
 import SwiftUI
 import RealityKit
 
+// DEPRECATED: Gesture panel functionality moved to main window (ContentView)
+// This file is kept for reference but is no longer used in the application
+
 /// View that displays a control panel above the user's hand when palm-up gesture is detected
 struct GestureControlPanelView: View {
     @Environment(ARManager.self) var arManager

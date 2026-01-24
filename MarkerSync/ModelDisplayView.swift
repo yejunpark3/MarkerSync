@@ -23,12 +23,6 @@ struct ModelDisplayView: View {
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
 
-    // MARK: - Gesture Panel State
-    @State private var currentHandTransform: simd_float4x4?
-    @State private var isGestureActive = false
-    @State private var gestureSelectedColor: TankColor = .desertTan
-    @State private var gestureSelectedOptions = TankOptions()
-
     var body: some View {
         ZStack {
             RealityView { content, attachments in
@@ -42,17 +36,6 @@ struct ModelDisplayView: View {
                 Attachment(id: "explanationWindow") {
                     if showExplanation {
                         TankExplanationView()
-                    }
-                }
-
-                Attachment(id: "gestureControlPanel") {
-                    if isGestureActive {
-                        ControlPanelView(
-                            isHost: isHost,
-                            currentColor: $gestureSelectedColor,
-                            currentOptions: $gestureSelectedOptions
-                        )
-                        .frame(width: 400, height: 600)
                     }
                 }
             }
@@ -73,15 +56,6 @@ struct ModelDisplayView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .worldAnchorUpdated)) { notification in
             handleDriftNotification(notification)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .palmUpGestureDetected)) { notification in
-            guard let transform = notification.object as? simd_float4x4 else { return }
-            currentHandTransform = transform
-            isGestureActive = true
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .palmUpGestureEnded)) { _ in
-            isGestureActive = false
-            currentHandTransform = nil
         }
         .onDisappear {
             cleanup()
@@ -218,9 +192,6 @@ struct ModelDisplayView: View {
                 configureExplanationAttachment(explanationAttachment, height: cachedHeight)
             }
         }
-
-        // Update gesture panel
-        updateGesturePanel(in: content, attachments: attachments)
     }
     
     private func loadModel(for anchorId: UUID, anchorInfo: SharedAnchorInfo, content: RealityViewContent) {
@@ -363,44 +334,6 @@ struct ModelDisplayView: View {
         attachment.components.set(BillboardComponent())
 
         print("📍 Explanation window positioned at y=\(baseHeight * 1.2)m")
-    }
-
-    // MARK: - Gesture Panel Management
-
-    /// Update gesture panel position based on hand tracking
-    private func updateGesturePanel(in content: RealityViewContent, attachments: RealityViewAttachments) {
-        // Remove panel if gesture is inactive
-        guard isGestureActive, let handTransform = currentHandTransform else {
-            if let handRoot = content.entities.first(where: { $0.name == "handGestureRoot" }) {
-                content.remove(handRoot)
-                print("🗑️ Removed hand gesture panel")
-            }
-            return
-        }
-
-        // Update existing panel transform (prevents flickering)
-        if let existingHandRoot = content.entities.first(where: { $0.name == "handGestureRoot" }) {
-            existingHandRoot.transform = Transform(matrix: handTransform)
-            return
-        }
-
-        // Create new panel entity (first detection)
-        let handRoot = Entity()
-        handRoot.name = "handGestureRoot"
-        handRoot.transform = Transform(matrix: handTransform)
-
-        if let panelAttachment = attachments.entity(for: "gestureControlPanel") {
-            // Position 15cm above hand
-            panelAttachment.position = [0, 0.15, 0]
-
-            // Make panel face camera
-            panelAttachment.components.set(BillboardComponent())
-
-            handRoot.addChild(panelAttachment)
-            print("✨ Created hand gesture panel at position: \(handRoot.position)")
-        }
-
-        content.add(handRoot)
     }
 
     private func calculateEntityHeight(_ entity: Entity) -> Float? {

@@ -16,6 +16,7 @@ struct MarkerSyncApp: App {
             ContentView()
                 .environment(arManager)
         }
+        .defaultSize(width: 500, height: 800)
         // .groupActivityAssociation(ARCollaborationActivity.self)  // Not available in this SDK version
 
         ImmersiveSpace(id: "tracking") {

@@ -20,7 +20,11 @@ class ARManager {
     
     // MARK: - Shared Anchors
     var sharedAnchors: [UUID: SharedAnchorInfo] = [:]
-    
+
+    // MARK: - Tank Customization State
+    var selectedTankColor: TankColor = .desertTan
+    var selectedTankOptions = TankOptions()
+
     // MARK: - Sampling State
     var samples: [TransformSample] = []
     var firstDetectionTime: Date?
