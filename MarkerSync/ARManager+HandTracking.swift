@@ -50,6 +50,9 @@ extension ARManager {
         let anchor = update.anchor
         print("👆 handleHandAnchorUpdate called - chirality: \(anchor.chirality), isTracked: \(anchor.isTracked)")
 
+        // Track previous gesture state
+        let wasDetected = (gestureDetectionState == .detected)
+
         // Collect both hands data
         if anchor.chirality == .left {
             handsData.left = anchor.isTracked ? anchor : nil
@@ -66,6 +69,13 @@ extension ARManager {
             logPalmUpGestureDetection(transform: transform)
         } else {
             print("   ❌ No gesture detected this frame")
+
+            // Post gesture ended notification if gesture was previously detected
+            if wasDetected {
+                gestureDetectionState = .searching
+                NotificationCenter.default.post(name: .palmUpGestureEnded, object: nil)
+                print("👋 Palm-up gesture ENDED")
+            }
         }
     }
 

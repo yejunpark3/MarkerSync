@@ -194,15 +194,32 @@ extension ARManager {
     /// Stop image tracking (Phase 7 이후)
     func stopImageTracking() {
         print("🛑 Stopping image tracking...")
-        
+
         imageTrackingTask?.cancel()
         imageTrackingTask = nil
         currentImageAnchor = nil
-        
+
         Task {
-            if let worldTracking = worldTracking {
-                try? await session.run([worldTracking])
-                print("✅ Session now running WorldTracking only")
+            // Keep WorldTracking and HandTracking active after stopping image tracking
+            guard let worldTracking = worldTracking else {
+                print("⚠️ WorldTracking unavailable, cannot reconfigure session")
+                return
+            }
+
+            // Build provider array - keep HandTracking if available
+            var providers: [any DataProvider] = [worldTracking]
+            if let handTracking = handTracking {
+                providers.append(handTracking)
+                print("🔄 Reconfiguring session: WorldTracking + HandTracking")
+            } else {
+                print("🔄 Reconfiguring session: WorldTracking only (HandTracking unavailable)")
+            }
+
+            do {
+                try await session.run(providers)
+                print("✅ Session reconfigured - image tracking stopped, hand tracking active")
+            } catch {
+                print("❌ Failed to reconfigure session: \(error.localizedDescription)")
             }
         }
     }

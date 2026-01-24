@@ -15,9 +15,6 @@ struct ModelDisplayView: View {
     @State private var loadError: String?
     @State private var showDebugInfo = true
     @State private var showExplanation = true
-    @State private var showControlPanel = true
-    @State private var currentColor: TankColor = .desertTan
-    @State private var currentOptions: TankOptions = TankOptions()
     @State private var isHost: Bool = true
     @State private var lastDriftDistance: Float = 0
     @State private var totalDriftCorrections: Int = 0
@@ -25,7 +22,13 @@ struct ModelDisplayView: View {
 
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
-    
+
+    // MARK: - Gesture Panel State
+    @State private var currentHandTransform: simd_float4x4?
+    @State private var isGestureActive = false
+    @State private var gestureSelectedColor: TankColor = .desertTan
+    @State private var gestureSelectedOptions = TankOptions()
+
     var body: some View {
         ZStack {
             RealityView { content, attachments in
@@ -42,16 +45,19 @@ struct ModelDisplayView: View {
                     }
                 }
 
-                Attachment(id: "controlPanel") {
-                    if showControlPanel {
+                Attachment(id: "gestureControlPanel") {
+                    if isGestureActive {
                         ControlPanelView(
                             isHost: isHost,
-                            currentColor: $currentColor,
-                            currentOptions: $currentOptions
+                            currentColor: $gestureSelectedColor,
+                            currentOptions: $gestureSelectedOptions
                         )
+                        .frame(width: 400, height: 600)
                     }
                 }
             }
+
+            // REMOVED: GestureControlPanelView() - Integrated into main RealityView
 
             // 상태 오버레이
             statusOverlay
@@ -67,6 +73,15 @@ struct ModelDisplayView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .worldAnchorUpdated)) { notification in
             handleDriftNotification(notification)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .palmUpGestureDetected)) { notification in
+            guard let transform = notification.object as? simd_float4x4 else { return }
+            currentHandTransform = transform
+            isGestureActive = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .palmUpGestureEnded)) { _ in
+            isGestureActive = false
+            currentHandTransform = nil
         }
         .onDisappear {
             cleanup()
@@ -123,28 +138,6 @@ struct ModelDisplayView: View {
                     totalCorrections: totalDriftCorrections
                 )
             }
-
-            Button(action: {
-                showExplanation.toggle()
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: showExplanation ? "info.circle.fill" : "info.circle")
-                    Text(showExplanation ? "정보 숨기기" : "정보 보기")
-                }
-            }
-
-            Button(action: {
-                showControlPanel.toggle()
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: showControlPanel ? "slider.horizontal.3" : "slider.horizontal.3")
-                    Text(showControlPanel ? "제어 숨기기" : "제어 보기")
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial)
-            .cornerRadius(12)
         }
         .padding(.bottom, 50)
         
@@ -226,14 +219,8 @@ struct ModelDisplayView: View {
             }
         }
 
-        // Control panel configuration remains unchanged (lines 225-231)
-        if let controlPanel = attachments.entity(for: "controlPanel"),
-           let tankContainer = modelEntities[anchorId] {
-            if !tankContainer.children.contains(where: { $0.name == "controlPanel" }) {
-                tankContainer.addChild(controlPanel)
-                configureControlPanel(controlPanel)  // No height parameter
-            }
-        }
+        // Update gesture panel
+        updateGesturePanel(in: content, attachments: attachments)
     }
     
     private func loadModel(for anchorId: UUID, anchorInfo: SharedAnchorInfo, content: RealityViewContent) {
@@ -378,11 +365,42 @@ struct ModelDisplayView: View {
         print("📍 Explanation window positioned at y=\(baseHeight * 1.2)m")
     }
 
-    private func configureControlPanel(_ attachment: Entity) {
-        attachment.name = "controlPanel"
-        attachment.position = [-1.0, 1.0, 0]
+    // MARK: - Gesture Panel Management
 
-        attachment.components.set(BillboardComponent())
+    /// Update gesture panel position based on hand tracking
+    private func updateGesturePanel(in content: RealityViewContent, attachments: RealityViewAttachments) {
+        // Remove panel if gesture is inactive
+        guard isGestureActive, let handTransform = currentHandTransform else {
+            if let handRoot = content.entities.first(where: { $0.name == "handGestureRoot" }) {
+                content.remove(handRoot)
+                print("🗑️ Removed hand gesture panel")
+            }
+            return
+        }
+
+        // Update existing panel transform (prevents flickering)
+        if let existingHandRoot = content.entities.first(where: { $0.name == "handGestureRoot" }) {
+            existingHandRoot.transform = Transform(matrix: handTransform)
+            return
+        }
+
+        // Create new panel entity (first detection)
+        let handRoot = Entity()
+        handRoot.name = "handGestureRoot"
+        handRoot.transform = Transform(matrix: handTransform)
+
+        if let panelAttachment = attachments.entity(for: "gestureControlPanel") {
+            // Position 15cm above hand
+            panelAttachment.position = [0, 0.15, 0]
+
+            // Make panel face camera
+            panelAttachment.components.set(BillboardComponent())
+
+            handRoot.addChild(panelAttachment)
+            print("✨ Created hand gesture panel at position: \(handRoot.position)")
+        }
+
+        content.add(handRoot)
     }
 
     private func calculateEntityHeight(_ entity: Entity) -> Float? {
