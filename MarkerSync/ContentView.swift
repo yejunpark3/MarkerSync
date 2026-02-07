@@ -99,7 +99,7 @@ struct ContentView: View {
                 )
                 
             case .hostMode:
-                HostModeView(trackingStatus: arManager.trackingStatus)
+                HostModeView()
                 
             case .viewingModel:
                 ViewingModelView(
@@ -180,6 +180,7 @@ struct ContentView: View {
         Task {
             arManager.userRole = .host
             arManager.appState = .hostMode
+            arManager.resetWallSelectionFlow()
             await openImmersiveSpace(id: "tracking")
         }
     }
@@ -334,46 +335,130 @@ struct WaitingForHostView: View {
 }
 
 struct HostModeView: View {
-    let trackingStatus: TrackingStatus
-    
+    @Environment(ARManager.self) private var arManager
+
+    private var walls: [DetectedWall] {
+        arManager.detectedWalls
+    }
+
     var body: some View {
         VStack(spacing: 24) {
-            // 상태에 따른 아이콘
             statusIcon
-            
-            Text("마커 인식 모드")
+
+            Text(arManager.isMarkerTrackingActive ? "마커 인식 모드" : "벽 감지/선택 모드")
                 .font(.title2)
-            
-            // TrackingStatus 상세 표시
-            VStack(spacing: 8) {
-                Text(trackingStatus.displayText)
-                    .font(.headline)
-                    .foregroundColor(statusColor)
-                
-                statusDescription
+
+            if !arManager.isMarkerTrackingActive {
+                wallSelectionPanel
+            } else {
+                markerTrackingPanel
             }
-            .padding()
-            .background(statusColor.opacity(0.1))
-            .cornerRadius(12)
         }
     }
-    
+
+    @ViewBuilder
+    private var wallSelectionPanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("감지된 벽 목록")
+                .font(.headline)
+
+            if walls.isEmpty {
+                Text("벽을 스캔 중입니다. 주변 벽을 바라봐 주세요.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else {
+                wallListView
+            }
+
+            HStack(spacing: 12) {
+                Button("벽 다시 선택") {
+                    arManager.resetWallSelectionFlow()
+                }
+                .buttonStyle(.bordered)
+                .disabled(arManager.selectedWall == nil)
+
+                Button("마커 인식 창으로 이동") {
+                    arManager.startMarkerRecognitionFlow()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(arManager.selectedWall == nil)
+            }
+        }
+        .padding()
+        .background(Color.blue.opacity(0.08))
+        .cornerRadius(12)
+    }
+
+    private var wallListView: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                ForEach(walls.indices, id: \.self) { index in
+                    wallRow(index: index, wall: walls[index])
+                }
+            }
+        }
+        .frame(maxHeight: 220)
+    }
+
+    private func wallRow(index: Int, wall: DetectedWall) -> some View {
+        let isSelected = arManager.selectedWall?.id == wall.id
+        let backgroundColor = isSelected ? Color.green.opacity(0.16) : Color.blue.opacity(0.08)
+        let borderColor = isSelected ? Color.green : Color.clear
+
+        return Button {
+            arManager.selectWallForXRay(wall)
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("벽 \(index + 1)")
+                    .font(.subheadline.weight(.semibold))
+                Text("좌표: \(wall.formattedPosition)")
+                    .font(.caption.monospaced())
+                Text("노멀: \(wall.formattedNormal)")
+                    .font(.caption.monospaced())
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(backgroundColor)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(borderColor, lineWidth: 1.5)
+            )
+            .cornerRadius(10)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var markerTrackingPanel: some View {
+        VStack(spacing: 8) {
+            Text(arManager.trackingStatus.displayText)
+                .font(.headline)
+                .foregroundColor(statusColor)
+
+            statusDescription
+        }
+        .padding()
+        .background(statusColor.opacity(0.1))
+        .cornerRadius(12)
+    }
+
     @ViewBuilder
     private var statusIcon: some View {
         ZStack {
             Circle()
                 .fill(statusColor.opacity(0.1))
                 .frame(width: 100, height: 100)
-            
+
             Image(systemName: statusIconName)
                 .font(.system(size: 40))
                 .foregroundColor(statusColor)
         }
     }
-    
+
     private var statusIconName: String {
-        switch trackingStatus {
+        switch arManager.trackingStatus {
         case .notStarted: return "hourglass"
+        case .wallSelecting: return "square.3.layers.3d.top.filled"
         case .searching: return "viewfinder"
         case .stabilizing: return "gyroscope"
         case .sampling: return "waveform.path.ecg"
@@ -382,10 +467,11 @@ struct HostModeView: View {
         case .error: return "exclamationmark.triangle"
         }
     }
-    
+
     private var statusColor: Color {
-        switch trackingStatus {
+        switch arManager.trackingStatus {
         case .notStarted: return .gray
+        case .wallSelecting: return .blue
         case .searching: return .blue
         case .stabilizing: return .orange
         case .sampling: return .blue
@@ -394,25 +480,30 @@ struct HostModeView: View {
         case .error: return .red
         }
     }
-    
+
     @ViewBuilder
     private var statusDescription: some View {
-        switch trackingStatus {
+        switch arManager.trackingStatus {
         case .notStarted:
             Text("이미지 트래킹을 시작하는 중...")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
+        case .wallSelecting:
+            Text("벽을 선택한 뒤 마커 인식을 시작하세요.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
         case .searching:
             Text("2D 마커를 카메라에 비춰주세요")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
         case .stabilizing:
             Text("World Tracking 안정화 대기 중")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
         case .sampling(let current, let total):
             VStack(spacing: 4) {
                 ProgressView(value: Double(current), total: Double(total))
@@ -421,17 +512,17 @@ struct HostModeView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-            
+
         case .found:
             Text("위치가 확정되었습니다. 확인을 눌러주세요.")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
         case .anchored:
             Text("WorldAnchor가 생성되었습니다")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
         case .error(let message):
             Text(message)
                 .font(.caption)
@@ -640,6 +731,7 @@ struct TrackingStatusIndicator: View {
     private var statusColor: Color {
         switch status {
         case .notStarted: return .gray
+        case .wallSelecting: return .blue
         case .searching, .stabilizing, .sampling: return .blue
         case .found, .anchored: return .green
         case .error: return .red

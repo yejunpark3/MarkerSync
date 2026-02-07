@@ -13,12 +13,18 @@ struct MarkerTrackingView: View {
     @State private var attachmentAdded = false
     @State private var isCreatingAnchor = false
     @State private var showDebugInfo = true
+    @State private var wallRootAdded = false
 
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
     
     var body: some View {
         RealityView { content, attachments in
+            if !wallRootAdded {
+                content.add(arManager.wallVisualizationRoot)
+                wallRootAdded = true
+            }
+
             // 초기 설정 - 고정 참조 오브젝트 (디버그용)
             if showDebugInfo {
                 addDebugReferenceObjects(to: content)
@@ -52,7 +58,13 @@ struct MarkerTrackingView: View {
         }
         .task {
             arManager.appState = .hostMode
-            await startImageTracking()
+            if !arManager.isWallSelectionCompleted {
+                arManager.trackingStatus = .wallSelecting
+            }
+        }
+        .onChange(of: arManager.isMarkerTrackingActive) { _, isActive in
+            guard isActive else { return }
+            Task { await startImageTracking() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .imageAnchorDetected)) { notification in
             handleAnchorNotification(notification)
@@ -182,6 +194,8 @@ struct MarkerTrackingView: View {
         
         // 상태에 따른 색상
         let color: UIColor = switch status {
+        case .wallSelecting:
+            .systemBlue.withAlphaComponent(0.4)
         case .searching, .stabilizing:
             .systemYellow.withAlphaComponent(0.5)
         case .sampling:
@@ -360,6 +374,14 @@ struct StatusOverlayView: View {
                 iconColor: .gray,
                 title: "준비 중...",
                 showProgress: true
+            )
+
+        case .wallSelecting:
+            StatusCard(
+                icon: "square.3.layers.3d.top.filled",
+                iconColor: .blue,
+                title: "벽 선택 대기",
+                subtitle: "윈도우에서 벽을 선택한 뒤 마커 인식을 시작하세요"
             )
             
         case .searching:

@@ -19,6 +19,7 @@ enum SamplingConfig {
 /// 마커 추적 상태 (UI 표시용)
 enum TrackingStatus: Equatable {
     case notStarted                             // 초기 대기 상태
+    case wallSelecting                          // 벽 선택 중
     case searching                              // 마커 탐색 중
     case stabilizing                            // World Tracking 안정화 대기
     case sampling(current: Int, total: Int)     // 위치 샘플링 진행 중
@@ -30,6 +31,8 @@ enum TrackingStatus: Equatable {
         switch self {
         case .notStarted:
             return "준비 중..."
+        case .wallSelecting:
+            return "벽 감지 및 선택 중..."
         case .searching:
             return "마커를 찾는 중..."
         case .stabilizing:
@@ -172,6 +175,7 @@ enum ARError: LocalizedError {
     case heightOutOfRange(height: Float)
     case samplingTimeout
     case handTrackingUnavailable
+    case wallSelectionRequired
 
     var errorDescription: String? {
         switch self {
@@ -203,6 +207,8 @@ enum ARError: LocalizedError {
             return "위치 샘플링 시간이 초과되었습니다"
         case .handTrackingUnavailable:
             return "손 트래킹을 사용할 수 없습니다"
+        case .wallSelectionRequired:
+            return "마커 인식 전에 X-Ray 적용 벽을 선택해주세요"
         }
     }
 }

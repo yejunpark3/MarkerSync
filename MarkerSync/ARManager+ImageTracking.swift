@@ -10,6 +10,10 @@ extension ARManager {
         guard let imageTracking = imageTracking else {
             throw ARError.imageTrackingUnavailable
         }
+        guard selectedWall != nil else {
+            throw ARError.wallSelectionRequired
+        }
+        isMarkerTrackingActive = true
 
         // 샘플링 상태 초기화
         resetSampling()
@@ -198,26 +202,28 @@ extension ARManager {
         imageTrackingTask?.cancel()
         imageTrackingTask = nil
         currentImageAnchor = nil
+        isMarkerTrackingActive = false
 
         Task {
-            // Keep WorldTracking and HandTracking active after stopping image tracking
+            // Keep WorldTracking/HandTracking/RoomTracking active after stopping image tracking
             guard let worldTracking = worldTracking else {
                 print("⚠️ WorldTracking unavailable, cannot reconfigure session")
                 return
             }
 
-            // Build provider array - keep HandTracking if available
+            // Build provider array - keep HandTracking and RoomTracking if available
             var providers: [any DataProvider] = [worldTracking]
             if let handTracking = handTracking {
                 providers.append(handTracking)
-                print("🔄 Reconfiguring session: WorldTracking + HandTracking")
-            } else {
-                print("🔄 Reconfiguring session: WorldTracking only (HandTracking unavailable)")
             }
+            if let roomTracking = roomTracking {
+                providers.append(roomTracking)
+            }
+            print("🔄 Reconfiguring session: WorldTracking + optional HandTracking/RoomTracking")
 
             do {
                 try await session.run(providers)
-                print("✅ Session reconfigured - image tracking stopped, hand tracking active")
+                print("✅ Session reconfigured - image tracking stopped")
             } catch {
                 print("❌ Failed to reconfigure session: \(error.localizedDescription)")
             }

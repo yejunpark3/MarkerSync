@@ -21,6 +21,19 @@ class ARManager {
     // MARK: - Shared Anchors
     var sharedAnchors: [UUID: SharedAnchorInfo] = [:]
 
+    // MARK: - Wall Tracking (RoomAnchor)
+    var detectedWalls: [DetectedWall] = []
+    var selectedWall: DetectedWall?
+    var isWallSelectionCompleted: Bool = false
+    var isMarkerTrackingActive: Bool = false
+    let wallVisualizationRoot = Entity()
+    var wallTrackingTask: Task<Void, Never>?
+    var roomTracking: RoomTrackingProvider?
+    var wallsByID: [UUID: DetectedWall] = [:]
+    var wallEntities: [UUID: ModelEntity] = [:]
+    var wallArrowEntities: [UUID: Entity] = [:]
+    var anchorToWallIDs: [UUID: [UUID]] = [:]
+
     // MARK: - Tank Customization State
     var selectedTankColor: TankColor = .desertTan
     var selectedTankOptions = TankOptions()
@@ -92,6 +105,7 @@ class ARManager {
 
             observeGroupSessions()
             startWorldAnchorObservation()
+            startWallTracking()
 
             // Start monitoring loops for tracking (providers already running from setupProviders)
             do {
@@ -159,6 +173,15 @@ class ARManager {
         handTracking = HandTrackingProvider()
         print("✅ HandTracking provider initialized")
 
+        // RoomTracking for wall detection
+        if RoomTrackingProvider.isSupported {
+            roomTracking = RoomTrackingProvider()
+            print("✅ RoomTracking provider initialized")
+        } else {
+            roomTracking = nil
+            print("⚠️ RoomTracking is not supported on this device")
+        }
+
         // Start session with ALL providers at once
         guard let worldTracking = worldTracking else {
             throw ARError.worldTrackingUnavailable
@@ -172,11 +195,14 @@ class ARManager {
         if let handTracking = handTracking {
             providers.append(handTracking)
         }
+        if let roomTracking = roomTracking {
+            providers.append(roomTracking)
+        }
 
         try await session.run(providers)
         worldTrackingStartTime = Date()
 
-        print("✅ All providers started: WorldTracking, ImageTracking, HandTracking")
+        print("✅ All providers started: WorldTracking, ImageTracking, HandTracking, RoomTracking")
 
         // World Tracking 안정화 대기 시작
         startWorldTrackingStabilization()
@@ -320,12 +346,14 @@ class ARManager {
         groupSessionTask?.cancel()
         stabilizationTask?.cancel()
         handTrackingTask?.cancel()
+        wallTrackingTask?.cancel()
 
         imageTrackingTask = nil
         worldTrackingTask = nil
         groupSessionTask = nil
         stabilizationTask = nil
         handTrackingTask = nil
+        wallTrackingTask = nil
         
         // SharePlay 정리
         groupSession?.leave()
@@ -336,6 +364,16 @@ class ARManager {
         sharedAnchors.removeAll()
         anchorEntities.removeAll()
         isConnected = false
+        detectedWalls.removeAll()
+        wallsByID.removeAll()
+        wallEntities.values.forEach { $0.removeFromParent() }
+        wallArrowEntities.values.forEach { $0.removeFromParent() }
+        wallEntities.removeAll()
+        wallArrowEntities.removeAll()
+        anchorToWallIDs.removeAll()
+        selectedWall = nil
+        isWallSelectionCompleted = false
+        isMarkerTrackingActive = false
         
         // 샘플링 상태 초기화
         resetSampling()

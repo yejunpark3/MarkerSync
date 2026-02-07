@@ -8,13 +8,18 @@
 def Xform "Root"
 {
     reorder nameChildren = ["Sphere_Left", "Sphere_Right", "GridMaterial"]
-    def "Leopard_2A6_Free" (
+    def "Scene" (
         active = true
-        prepend references = @Leopard_2A6_Free.usdz@
+        prepend references = @Scene.usdz@
     )
     {
-        float3 xformOp:scale = (0.0025, 0.0025, 0.0025)
+        float3 xformOp:scale = (1, 1, 1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "Leopard_2A6_Free"
+        {
+            float3 xformOp:scale = (0.0025, 0.0025, 0.0025)
+        }
     }
 }
 

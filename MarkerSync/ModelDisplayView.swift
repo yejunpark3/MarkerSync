@@ -177,6 +177,7 @@ struct ModelDisplayView: View {
         // 기존 모델이 있으면 Transform 업데이트 (Drift 보정)
         if let existingModel = modelEntities[anchorId] {
             existingModel.transform = newTransform
+            applyXRayParameters(to: existingModel)
         } else {
             // 모델이 없으면 새로 로드
             loadModel(for: anchorId, anchorInfo: anchorInfo, content: content)
@@ -216,6 +217,7 @@ struct ModelDisplayView: View {
                 model.name = "k2_tank_model"
                 
                 container.addChild(model)
+                applyXRayParameters(to: container)
 
                 // Calculate entity height for dynamic positioning
                 if let modelEntity = container.findEntity(named: "k2_tank_model"),
@@ -405,6 +407,79 @@ struct ModelDisplayView: View {
         print("   Position: \(position)")
         print("   Container world position: \(container.position(relativeTo: nil))")
         print("   Is Host created: \(anchorInfo.creatorId != nil)")
+    }
+
+    // MARK: - XRay
+
+    private func applyXRayParameters(to entity: Entity) {
+        let wallNormal: SIMD3<Float>
+        let wallD: Float
+        let insideAlpha: Float
+
+        if let selectedWall = arManager.selectedWall {
+            wallNormal = selectedWall.normal
+            wallD = selectedWall.distance
+            insideAlpha = 0.3
+        } else {
+            // 벽 미선택 시 완전 불투명 유지
+            wallNormal = SIMD3<Float>(0, 1, 0)
+            wallD = 0
+            insideAlpha = 1.0
+        }
+
+        let updatedCount = setShaderParametersRecursive(
+            entity: entity,
+            wallNormal: wallNormal,
+            wallD: wallD,
+            insideAlpha: insideAlpha
+        )
+
+        if updatedCount == 0 {
+            print("⚠️ XRay params not applied: no ShaderGraphMaterial found")
+        }
+    }
+
+    private func setShaderParametersRecursive(
+        entity: Entity,
+        wallNormal: SIMD3<Float>,
+        wallD: Float,
+        insideAlpha: Float
+    ) -> Int {
+        var appliedCount = 0
+
+        if var modelComponent = entity.components[ModelComponent.self] {
+            var updatedMaterials: [any RealityKit.Material] = []
+
+            for material in modelComponent.materials {
+                if var shaderMaterial = material as? ShaderGraphMaterial {
+                    do {
+                        try shaderMaterial.setParameter(name: "WallNormal", value: .simd3Float(wallNormal))
+                        try shaderMaterial.setParameter(name: "WallD", value: .float(wallD))
+                        try shaderMaterial.setParameter(name: "InsideAlpha", value: .float(insideAlpha))
+                        updatedMaterials.append(shaderMaterial)
+                        appliedCount += 1
+                    } catch {
+                        updatedMaterials.append(material)
+                    }
+                } else {
+                    updatedMaterials.append(material)
+                }
+            }
+
+            modelComponent.materials = updatedMaterials
+            entity.components[ModelComponent.self] = modelComponent
+        }
+
+        for child in entity.children {
+            appliedCount += setShaderParametersRecursive(
+                entity: child,
+                wallNormal: wallNormal,
+                wallD: wallD,
+                insideAlpha: insideAlpha
+            )
+        }
+
+        return appliedCount
     }
 }
 

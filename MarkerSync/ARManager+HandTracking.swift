@@ -22,7 +22,7 @@ extension ARManager {
             guard let self = self, let handTracking = self.handTracking else { return }
 
             for await update in handTracking.anchorUpdates {
-                print("🖐️ Hand anchor update received: \(update.event)")
+                // print("🖐️ Hand anchor update received: \(update.event)")
                 if Task.isCancelled { break }
                 await MainActor.run {
                     self.handleHandAnchorUpdate(update)
@@ -48,7 +48,7 @@ extension ARManager {
     /// Handle hand anchor updates from ARKit
     private func handleHandAnchorUpdate(_ update: AnchorUpdate<HandAnchor>) {
         let anchor = update.anchor
-        print("👆 handleHandAnchorUpdate called - chirality: \(anchor.chirality), isTracked: \(anchor.isTracked)")
+        // print("👆 handleHandAnchorUpdate called - chirality: \(anchor.chirality), isTracked: \(anchor.isTracked)")
 
         // Track previous gesture state
         let wasDetected = (gestureDetectionState == .detected)
@@ -56,19 +56,19 @@ extension ARManager {
         // Collect both hands data
         if anchor.chirality == .left {
             handsData.left = anchor.isTracked ? anchor : nil
-            print("   Left hand: \(handsData.left != nil ? "tracked" : "nil")")
+            // print("   Left hand: \(handsData.left != nil ? "tracked" : "nil")")
         } else if anchor.chirality == .right {
             handsData.right = anchor.isTracked ? anchor : nil
-            print("   Right hand: \(handsData.right != nil ? "tracked" : "nil")")
+            // print("   Right hand: \(handsData.right != nil ? "tracked" : "nil")")
         }
 
-        print("   Both hands tracked: \(handsData.bothHandsTracked)")
+        // print("   Both hands tracked: \(handsData.bothHandsTracked)")
 
         // Attempt palm-up gesture detection
         if let transform = computePalmUpGesture() {
             logPalmUpGestureDetection(transform: transform)
         } else {
-            print("   ❌ No gesture detected this frame")
+            // print("   ❌ No gesture detected this frame")
 
             // Post gesture ended notification if gesture was previously detected
             if wasDetected {
@@ -88,7 +88,7 @@ extension ARManager {
         // Step 1: Verify RIGHT hand is tracked (left hand not needed)
         guard let rightHand = handsData.right,
               rightHand.isTracked else {
-            print("   [Gesture] ❌ Right hand not tracked")
+            // print("   [Gesture] ❌ Right hand not tracked")
             return nil
         }
 
@@ -96,7 +96,7 @@ extension ARManager {
         guard let rightWrist = rightHand.handSkeleton?.joint(.wrist),
               let rightIndexMeta = rightHand.handSkeleton?.joint(.indexFingerMetacarpal),
               let rightRingMeta = rightHand.handSkeleton?.joint(.ringFingerMetacarpal) else {
-            print("   [Gesture] ❌ Missing joint data")
+            // print("   [Gesture] ❌ Missing joint data")
             return nil
         }
 
@@ -125,15 +125,15 @@ extension ARManager {
         let upVector = SIMD3<Float>(0, 1, 0)
         let dotProduct = dot(palmNormal, upVector)
 
-        print("   [Gesture] Right palm dot: \(String(format: "%.3f", dotProduct))")
+        // print("   [Gesture] Right palm dot: \(String(format: "%.3f", dotProduct))")
 
         // Step 6: Check threshold
         guard dotProduct > PalmUpGestureConfig.palmUpThreshold else {
-            print("   [Gesture] ❌ Palm orientation threshold not met (threshold: \(String(format: "%.3f", PalmUpGestureConfig.palmUpThreshold)))")
+            // print("   [Gesture] ❌ Palm orientation threshold not met (threshold: \(String(format: "%.3f", PalmUpGestureConfig.palmUpThreshold)))")
             return nil
         }
 
-        print("   [Gesture] ✅ Right palm-up gesture detected!")
+        // print("   [Gesture] ✅ Right palm-up gesture detected!")
 
         // Step 7: Create transform at right wrist position
         // Y-axis: palm normal (pointing up)
