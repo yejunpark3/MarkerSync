@@ -67,6 +67,42 @@ struct ColorSwatch: View {
     }
 }
 
+struct SelectableMeshToggleList: View {
+    let items: [SelectableMeshItem]
+    let isEnabled: Bool
+    let onToggle: (String, Bool) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("부위 표시")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            if items.isEmpty {
+                Text("표시 가능한 부위 없음")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 6) {
+                    ForEach(items) { item in
+                        Toggle(
+                            item.displayName,
+                            isOn: Binding(
+                                get: { item.isVisible },
+                                set: { newValue in
+                                    onToggle(item.entityKey, newValue)
+                                }
+                            )
+                        )
+                        .font(.caption)
+                        .disabled(!isEnabled)
+                    }
+                }
+            }
+        }
+    }
+}
+
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()

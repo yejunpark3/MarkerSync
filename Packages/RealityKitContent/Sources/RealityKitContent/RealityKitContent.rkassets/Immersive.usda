@@ -7,10 +7,10 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Sphere_Left", "Sphere_Right", "GridMaterial"]
+    reorder nameChildren = ["Selectable_Cube", "Scene"]
     def "Scene" (
         active = true
-        prepend references = @Scene.usdz@
+        references = @Scene.usdz@
     )
     {
         float3 xformOp:scale = (1, 1, 1)
@@ -19,6 +19,30 @@ def Xform "Root"
         over "Leopard_2A6_Free"
         {
             float3 xformOp:scale = (0.0025, 0.0025, 0.0025)
+        }
+    }
+
+    def Cube "Selectable_Cube" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/Selectable_Cube/DefaultMaterial>
+        double size = 0.2
+        float3 xformOp:translate = (0, 0.6, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Material "DefaultMaterial"
+        {
+            token outputs:surface.connect = </Root/Selectable_Cube/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+            def Shader "DefaultSurfaceShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
         }
     }
 }

@@ -4,6 +4,14 @@ import GroupActivities
 import Combine
 import SwiftUI
 
+struct SelectableMeshItem: Identifiable, Equatable {
+    let id: String
+    let entityKey: String
+    let sourceName: String
+    let displayName: String
+    var isVisible: Bool
+}
+
 @MainActor
 @Observable
 class ARManager {
@@ -37,6 +45,8 @@ class ARManager {
     // MARK: - Tank Customization State
     var selectedTankColor: TankColor = .desertTan
     var selectedTankOptions = TankOptions()
+    var selectableMeshItems: [SelectableMeshItem] = []
+    var selectableMeshVisibilityByKey: [String: Bool] = [:]
 
     // MARK: - Sampling State
     var samples: [TransformSample] = []
@@ -87,6 +97,24 @@ class ARManager {
     /// 마지막 샘플의 위치
     var lastSamplePosition: SIMD3<Float>? {
         samples.last?.position
+    }
+
+    func setSelectableMeshes(_ items: [SelectableMeshItem]) {
+        selectableMeshItems = items
+    }
+
+    func setSelectableMeshVisibility(key: String, isVisible: Bool) {
+        selectableMeshVisibilityByKey[key] = isVisible
+
+        guard let index = selectableMeshItems.firstIndex(where: { $0.entityKey == key }) else {
+            return
+        }
+
+        selectableMeshItems[index].isVisible = isVisible
+    }
+
+    func visibilityForSelectableMesh(key: String) -> Bool {
+        selectableMeshVisibilityByKey[key] ?? true
     }
     
     // MARK: - Lifecycle

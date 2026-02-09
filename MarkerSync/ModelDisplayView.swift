@@ -19,6 +19,8 @@ struct ModelDisplayView: View {
     @State private var lastDriftDistance: Float = 0
     @State private var totalDriftCorrections: Int = 0
     @State private var entityHeights: [UUID: Float] = [:]
+    @State private var selectableEntitiesByAnchor: [UUID: [String: Entity]] = [:]
+    @State private var selectableItemsByAnchor: [UUID: [SelectableMeshItem]] = [:]
 
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
@@ -53,6 +55,13 @@ struct ModelDisplayView: View {
         }
         .onChange(of: arManager.sharedAnchors) { _, anchors in
             handleAnchorsChanged(anchors)
+        }
+        .onChange(of: selectedAnchorId) { _, _ in
+            refreshSelectableMeshItemsForSelectedAnchor()
+        }
+        .onChange(of: arManager.selectableMeshItems) { _, items in
+            applySelectableMeshVisibilityForSelectedAnchor(items)
+            cacheSelectableMeshItemsForSelectedAnchor(items)
         }
         .onReceive(NotificationCenter.default.publisher(for: .worldAnchorUpdated)) { notification in
             handleDriftNotification(notification)
@@ -169,6 +178,7 @@ struct ModelDisplayView: View {
               let anchorInfo = arManager.sharedAnchors[anchorId],
               anchorInfo.isActive else {
             removeAllModels(from: content)
+            arManager.setSelectableMeshes([])
             return
         }
 
@@ -240,6 +250,29 @@ struct ModelDisplayView: View {
                 // 로컬 및 ARManager에 등록 (Drift 보정용)
                 modelEntities[anchorId] = container
                 arManager.registerEntity(container, for: anchorId)
+
+                // Selectable_ 메쉬 목록 생성 및 가시성 복원
+                let selectableEntries = collectSelectableEntities(from: model)
+                let selectableEntityMap = Dictionary(
+                    uniqueKeysWithValues: selectableEntries.map { ($0.key, $0.entity) }
+                )
+                let selectableItems = selectableEntries.map { entry in
+                    let isVisible = arManager.visibilityForSelectableMesh(key: entry.key)
+                    entry.entity.isEnabled = isVisible
+                    return SelectableMeshItem(
+                        id: "\(anchorId.uuidString)::\(entry.key)",
+                        entityKey: entry.key,
+                        sourceName: entry.sourceName,
+                        displayName: entry.displayName,
+                        isVisible: isVisible
+                    )
+                }
+                selectableEntitiesByAnchor[anchorId] = selectableEntityMap
+                selectableItemsByAnchor[anchorId] = selectableItems
+
+                if selectedAnchorId == anchorId {
+                    arManager.setSelectableMeshes(selectableItems)
+                }
                 
                 print("✅ Model loaded and registered for anchor: \(anchorId)")
                 printModelInfo(container, anchorInfo: anchorInfo)
@@ -262,6 +295,9 @@ struct ModelDisplayView: View {
             }
             modelEntities.removeAll()
             entityHeights.removeAll()
+            selectableEntitiesByAnchor.removeAll()
+            selectableItemsByAnchor.removeAll()
+            arManager.setSelectableMeshes([])
 
             if !arManager.sharedAnchors.isEmpty {
                 print("⚠️ All models removed - no active anchor selected")
@@ -294,6 +330,10 @@ struct ModelDisplayView: View {
                 print("   Auto-selected anchor: \(first.id)")
             }
         }
+
+        let activeAnchorIDs = Set(anchors.keys)
+        selectableEntitiesByAnchor = selectableEntitiesByAnchor.filter { activeAnchorIDs.contains($0.key) }
+        selectableItemsByAnchor = selectableItemsByAnchor.filter { activeAnchorIDs.contains($0.key) }
     }
     
     private func handleDriftNotification(_ notification: Notification) {
@@ -325,6 +365,79 @@ struct ModelDisplayView: View {
 
         modelEntities.removeAll()
         entityHeights.removeAll()
+        selectableEntitiesByAnchor.removeAll()
+        selectableItemsByAnchor.removeAll()
+        arManager.setSelectableMeshes([])
+    }
+
+    private func refreshSelectableMeshItemsForSelectedAnchor() {
+        guard let anchorId = selectedAnchorId else {
+            arManager.setSelectableMeshes([])
+            return
+        }
+
+        let items = selectableItemsByAnchor[anchorId] ?? []
+        arManager.setSelectableMeshes(items)
+    }
+
+    private func cacheSelectableMeshItemsForSelectedAnchor(_ items: [SelectableMeshItem]) {
+        guard let anchorId = selectedAnchorId else { return }
+        selectableItemsByAnchor[anchorId] = items
+    }
+
+    private func applySelectableMeshVisibilityForSelectedAnchor(_ items: [SelectableMeshItem]) {
+        guard let anchorId = selectedAnchorId,
+              let selectableEntities = selectableEntitiesByAnchor[anchorId] else {
+            return
+        }
+
+        for item in items {
+            selectableEntities[item.entityKey]?.isEnabled = item.isVisible
+        }
+    }
+
+    private struct SelectableEntityEntry {
+        let entity: Entity
+        let key: String
+        let sourceName: String
+        let displayName: String
+    }
+
+    private func collectSelectableEntities(from root: Entity) -> [SelectableEntityEntry] {
+        var collected: [SelectableEntityEntry] = []
+
+        func traverse(entity: Entity, siblingIndexPath: [Int]) {
+            let sourceName = entity.name
+            if sourceName.hasPrefix("Selectable_") {
+                let pathToken = siblingIndexPath.isEmpty
+                    ? "root"
+                    : siblingIndexPath.map(String.init).joined(separator: "/")
+                let key = "\(sourceName)#\(pathToken)"
+                let displayName = selectableDisplayName(from: sourceName)
+                collected.append(
+                    SelectableEntityEntry(
+                        entity: entity,
+                        key: key,
+                        sourceName: sourceName,
+                        displayName: displayName
+                    )
+                )
+            }
+
+            for (index, child) in entity.children.enumerated() {
+                traverse(entity: child, siblingIndexPath: siblingIndexPath + [index])
+            }
+        }
+
+        traverse(entity: root, siblingIndexPath: [])
+        return collected
+    }
+
+    private func selectableDisplayName(from sourceName: String) -> String {
+        let stripped = String(sourceName.dropFirst("Selectable_".count))
+        let formatted = stripped.replacingOccurrences(of: "_", with: " ")
+        let trimmed = formatted.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? sourceName : trimmed
     }
     
     private func configureExplanationAttachment(_ attachment: Entity, height: Float? = nil) {

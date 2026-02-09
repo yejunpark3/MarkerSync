@@ -581,6 +581,16 @@ struct ViewingModelView: View {
                         ),
                         isEnabled: true
                     )
+
+                    Divider()
+
+                    SelectableMeshToggleList(
+                        items: arManager.selectableMeshItems,
+                        isEnabled: true,
+                        onToggle: { key, isVisible in
+                            arManager.setSelectableMeshVisibility(key: key, isVisible: isVisible)
+                        }
+                    )
                 }
             } else {
                 // Participant view-only mode
