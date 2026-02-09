@@ -189,10 +189,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -497,10 +497,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1057
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -772,10 +772,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -1069,10 +1069,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -1391,10 +1391,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -1696,10 +1696,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -1958,10 +1958,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -2220,10 +2220,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -2482,10 +2482,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -2744,10 +2744,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -3030,10 +3030,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -3358,10 +3358,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -3689,10 +3689,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
@@ -4011,10 +4011,10 @@ def Xform "Root"
                             float3 inputs:normal.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph.inputs:PreviewSurface_normal>
                             float inputs:occlusion.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph.inputs:PreviewSurface_occlusion>
                             float inputs:opacity.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph/IfEqual_1.outputs:out>
-                            float inputs:opacityThreshold
+                            float inputs:opacityThreshold = 0.5
                             float inputs:roughness.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph.inputs:PreviewSurface_roughness>
                             float2 ui:nodegraph:node:pos = (1883, 1004.4375)
-                            int ui:nodegraph:node:stackingOrder = 1054
+                            int ui:nodegraph:node:stackingOrder = 1056
                             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
                         }
 
