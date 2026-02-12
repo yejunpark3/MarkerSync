@@ -38,3 +38,60 @@ struct TankOptions: Codable {
     var minePlow: Bool = false
     var additionalArmor: Bool = false
 }
+
+enum TankScalePreset: String, CaseIterable {
+    case small
+    case medium
+    case large
+
+    var scale: Float {
+        switch self {
+        case .small:
+            return 0.1
+        case .medium:
+            return 0.5
+        case .large:
+            return 1.0
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .small:
+            return "소형"
+        case .medium:
+            return "중형"
+        case .large:
+            return "대형"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .small:
+            return "shippingbox"
+        case .medium:
+            return "cube"
+        case .large:
+            return "cube.fill"
+        }
+    }
+}
+
+enum TankScaleConfig {
+    static let minScale: Float = 0.05
+    static let maxScale: Float = 1.5
+    static let referenceLengthMeters: Float = 10.8
+    static let animationDuration: TimeInterval = 0.2
+
+    static func estimatedSize(_ scale: Float) -> String {
+        let clampedScale = min(max(scale, minScale), maxScale)
+        let meters = clampedScale * referenceLengthMeters
+
+        if meters >= 1.0 {
+            return String(format: "%.1fm", meters)
+        }
+
+        return "\(Int((meters * 100).rounded()))cm"
+    }
+}

@@ -582,6 +582,14 @@ struct ViewingModelView: View {
                         isEnabled: true
                     )
 
+                    ScaleControlView(
+                        scale: Binding(
+                            get: { arManager.tankScale },
+                            set: { arManager.tankScale = $0 }
+                        ),
+                        isEnabled: true
+                    )
+
                     Divider()
 
                     SelectableMeshToggleList(

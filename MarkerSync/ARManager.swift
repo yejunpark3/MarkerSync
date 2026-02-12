@@ -45,6 +45,7 @@ class ARManager {
     // MARK: - Tank Customization State
     var selectedTankColor: TankColor = .desertTan
     var selectedTankOptions = TankOptions()
+    var tankScale: Float = 0.1
     var selectableMeshItems: [SelectableMeshItem] = []
     var selectableMeshVisibilityByKey: [String: Bool] = [:]
 
@@ -402,6 +403,7 @@ class ARManager {
         selectedWall = nil
         isWallSelectionCompleted = false
         isMarkerTrackingActive = false
+        tankScale = 0.1
         
         // 샘플링 상태 초기화
         resetSampling()

@@ -58,6 +58,10 @@ struct ModelDisplayView: View {
         }
         .onChange(of: selectedAnchorId) { _, _ in
             refreshSelectableMeshItemsForSelectedAnchor()
+            applyTankScale(arManager.tankScale, animated: false)
+        }
+        .onChange(of: arManager.tankScale) { _, newScale in
+            applyTankScale(newScale, animated: true)
         }
         .onChange(of: arManager.selectableMeshItems) { _, items in
             applySelectableMeshVisibilityForSelectedAnchor(items)
@@ -225,6 +229,7 @@ struct ModelDisplayView: View {
                 let model = try await Entity(named: "Immersive", in: realityKitContentBundle)
                 model.position = .zero
                 model.name = "k2_tank_model"
+                model.scale = SIMD3<Float>(repeating: min(max(arManager.tankScale, TankScaleConfig.minScale), TankScaleConfig.maxScale))
                 
                 container.addChild(model)
                 applyXRayParameters(to: container)
@@ -439,16 +444,72 @@ struct ModelDisplayView: View {
         let trimmed = formatted.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? sourceName : trimmed
     }
+
+    private func clampTankScale(_ value: Float) -> Float {
+        min(max(value, TankScaleConfig.minScale), TankScaleConfig.maxScale)
+    }
+
+    private func applyTankScale(_ scale: Float, animated: Bool) {
+        guard let anchorId = selectedAnchorId,
+              let tankContainer = modelEntities[anchorId],
+              let modelEntity = tankContainer.findEntity(named: "k2_tank_model") else {
+            return
+        }
+
+        let clampedScale = clampTankScale(scale)
+        var updatedTransform = modelEntity.transform
+        updatedTransform.scale = SIMD3<Float>(repeating: clampedScale)
+
+        if animated {
+            modelEntity.move(
+                to: updatedTransform,
+                relativeTo: modelEntity.parent,
+                duration: TankScaleConfig.animationDuration,
+                timingFunction: .easeInOut
+            )
+        } else {
+            modelEntity.transform = updatedTransform
+        }
+
+        repositionExplanationAfterScale(animated: animated, scale: clampedScale)
+    }
+
+    private func repositionExplanationAfterScale(animated: Bool, scale: Float? = nil) {
+        guard let anchorId = selectedAnchorId,
+              let tankContainer = modelEntities[anchorId],
+              let explanationEntity = tankContainer.children.first(where: { $0.name == "explanationWindow" }) else {
+            return
+        }
+
+        let baseHeight = entityHeights[anchorId] ?? 0.7
+        let currentScale = scale ?? clampTankScale(arManager.tankScale)
+        let targetY = baseHeight * currentScale * 1.2
+
+        var updatedTransform = explanationEntity.transform
+        updatedTransform.translation = SIMD3<Float>(0, targetY, 0)
+
+        if animated {
+            explanationEntity.move(
+                to: updatedTransform,
+                relativeTo: explanationEntity.parent,
+                duration: TankScaleConfig.animationDuration,
+                timingFunction: .easeInOut
+            )
+        } else {
+            explanationEntity.transform = updatedTransform
+        }
+    }
     
     private func configureExplanationAttachment(_ attachment: Entity, height: Float? = nil) {
         attachment.name = "explanationWindow"
 
         let baseHeight = height ?? 0.7  // fallback to original value
-        attachment.position = [0, baseHeight * 1.2, 0]
+        let currentScale = clampTankScale(arManager.tankScale)
+        attachment.position = [0, baseHeight * currentScale * 1.2, 0]
 
         attachment.components.set(BillboardComponent())
 
-        print("📍 Explanation window positioned at y=\(baseHeight * 1.2)m")
+        print("📍 Explanation window positioned at y=\(baseHeight * currentScale * 1.2)m")
     }
 
     private func calculateEntityHeight(_ entity: Entity) -> Float? {
