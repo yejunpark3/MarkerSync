@@ -173,7 +173,7 @@ def Xform "Root"
                         float inputs:PreviewSurface_roughness.connect = None
                         token outputs:PreviewSurface_out.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph/PreviewSurface.outputs:out>
                         float2 ui:nodegraph:node:pos = (324.5, 335.5)
-                        int ui:nodegraph:node:stackingOrder = 1010
+                        int ui:nodegraph:node:stackingOrder = 1011
                         float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (2129.25, 1004.4375)
 
                         def Shader "PreviewSurface" (
@@ -183,7 +183,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:PreviewSurface_metallic>
@@ -289,19 +289,6 @@ def Xform "Root"
                             float inputs:in.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph/IfGreaterOrEqual.outputs:out>
                             float outputs:out
                             float2 ui:nodegraph:node:pos = (1360, 82.5)
-                            int ui:nodegraph:node:stackingOrder = 1054
-                        }
-
-                        def Shader "Mix_1"
-                        {
-                            uniform token info:id = "ND_mix_color3"
-                            color3f inputs:bg = (0, 0.9914394, 1) (
-                                colorSpace = "srgb_texture"
-                            )
-                            color3f inputs:fg.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph.inputs:Mix_1_fg>
-                            float inputs:mix.connect = </Root/Scene/Leopard_2A6_Free/Materials/number_back/nodegraph/IfEqual.outputs:out>
-                            color3f outputs:out
-                            float2 ui:nodegraph:node:pos = (1616, 455)
                             int ui:nodegraph:node:stackingOrder = 1054
                         }
 
@@ -491,7 +478,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:PreviewSurface_metallic>
@@ -606,7 +593,7 @@ def Xform "Root"
                             color3f inputs:bg = (0, 0.9914394, 1) (
                                 colorSpace = "srgb_texture"
                             )
-                            color3f inputs:fg.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph.inputs:Mix_1_fg>
+                            color3f inputs:fg.connect = None
                             float inputs:mix.connect = </Root/Scene/Leopard_2A6_Free/Materials/BlackGlass_Base/nodegraph/IfEqual.outputs:out>
                             color3f outputs:out
                             float2 ui:nodegraph:node:pos = (1616, 455)
@@ -766,7 +753,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/material/nodegraph.inputs:PreviewSurface_metallic>
@@ -1006,7 +993,8 @@ def Xform "Root"
                             colorSpace = "lin_srgb"
                             customData = {
                                 dictionary realitykit = {
-                                    float2 positionInSubgraph = (1360, 654.9375)
+                                    float2 positionInSubgraph = (1315.0613, 660.0069)
+                                    int stackingOrderInSubgraph = 1058
                                 }
                             }
                         )
@@ -1063,7 +1051,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_3/nodegraph.inputs:PreviewSurface_metallic>
@@ -1385,7 +1373,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/material_5/nodegraph.inputs:PreviewSurface_metallic>
@@ -1690,7 +1678,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/red_light/nodegraph.inputs:PreviewSurface_metallic>
@@ -1952,7 +1940,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/Tank_3_001/nodegraph.inputs:PreviewSurface_metallic>
@@ -2214,7 +2202,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_3_001/nodegraph.inputs:PreviewSurface_metallic>
@@ -2476,7 +2464,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/vida_3_001/nodegraph.inputs:PreviewSurface_metallic>
@@ -2738,7 +2726,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/orange_light/nodegraph.inputs:PreviewSurface_metallic>
@@ -3024,7 +3012,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/wire_145028177/nodegraph.inputs:PreviewSurface_metallic>
@@ -3352,7 +3340,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/wheel_red/nodegraph.inputs:PreviewSurface_metallic>
@@ -3683,7 +3671,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/Rubber_katok/nodegraph.inputs:PreviewSurface_metallic>
@@ -3948,7 +3936,8 @@ def Xform "Root"
                         color3f inputs:Mix_1_fg (
                             customData = {
                                 dictionary realitykit = {
-                                    float2 positionInSubgraph = (1360, 654.9375)
+                                    float2 positionInSubgraph = (1324.8639, 626.4978)
+                                    int stackingOrderInSubgraph = 1058
                                 }
                             }
                         )
@@ -4005,7 +3994,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Leopard_2A6_Free/Materials/_005/nodegraph.inputs:PreviewSurface_metallic>
@@ -4531,7 +4520,7 @@ def Xform "Root"
                             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                             float inputs:clearcoat
                             float inputs:clearcoatRoughness
-                            color3f inputs:diffuseColor.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/nodegraph/Mix_1.outputs:out>
+                            color3f inputs:diffuseColor.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/nodegraph.inputs:Mix_1_fg>
                             color3f inputs:emissiveColor.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/nodegraph.inputs:PreviewSurface_emissiveColor>
                             float inputs:ior
                             float inputs:metallic.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/nodegraph.inputs:PreviewSurface_metallic>
