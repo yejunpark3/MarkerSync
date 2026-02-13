@@ -169,13 +169,17 @@ class ARManager {
     /// Request ARKit permissions
     private func requestAuthorization() async throws {
         print("🔐 Requesting ARKit authorization...")
-        let authResult = await session.requestAuthorization(for: [.worldSensing])
+        let authResult = await session.requestAuthorization(for: [.worldSensing, .handTracking])
         
         for (dataType, status) in authResult {
             switch status {
             case .denied:
-                print("❌ Authorization denied for: \(dataType)")
-                throw ARError.authorizationDenied("\(dataType)")
+                if dataType == .worldSensing {
+                    print("❌ Authorization denied for required permission: \(dataType)")
+                    throw ARError.authorizationDenied("\(dataType)")
+                } else {
+                    print("⚠️ Optional authorization denied for: \(dataType)")
+                }
             case .allowed:
                 print("✅ Authorization allowed for: \(dataType)")
             case .notDetermined:
