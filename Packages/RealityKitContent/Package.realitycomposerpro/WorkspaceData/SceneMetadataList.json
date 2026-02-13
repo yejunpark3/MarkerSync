@@ -4,98 +4,6 @@
       [
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root",
-        "Selectable_Missile_Turret",
-        "Meshes",
-        "Sketchfab_model",
-        "Collada_visual_scene_group"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Selectable_Missile_Turret"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "BlackGlass_Base"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Video_Dock"
-      ],
-      {
-        "disallowsFraming" : false,
-        "isExpanded" : false,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "vida_3_001"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "_005",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "red_light"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "material"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
         "Scene",
         "Leopard_2A6_Free",
         "Materials",
@@ -110,9 +18,7 @@
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root",
         "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "_005"
+        "Leopard_2A6_Free"
       ],
       {
         "isExpanded" : true,
@@ -124,167 +30,8 @@
         "Scene",
         "Leopard_2A6_Free",
         "Materials",
-        "material_5"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model",
-        "Leopard_2A6_fbx",
-        "RootNode",
-        "Box72",
-        "Box72_17___Default_0"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "material_5",
+        "orange_light",
         "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Selectable_Missile_Turret",
-        "Meshes",
-        "Sketchfab_model"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "red_light",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model",
-        "Leopard_2A6_fbx",
-        "RootNode",
-        "Up1",
-        "Up1_Crot2_0"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "Rubber_katok"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Material"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "number_back"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "material_3",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Missile_Turret",
-        "Materials"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model",
-        "Leopard_2A6_fbx",
-        "RootNode"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Selectable_Missile_Turret",
-        "Meshes"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Selectable_Missile_Turret",
-        "Materials"
       ],
       {
         "isExpanded" : true,
@@ -309,7 +56,53 @@
         "Scene",
         "Leopard_2A6_Free",
         "Materials",
-        "material_3"
+        "_005",
+        "nodegraph"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "SkyDome"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Selectable_Missile_Turret"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Leopard_2A6_Free",
+        "Materials",
+        "Rubber_3_001",
+        "nodegraph"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Selectable_Missile_Turret",
+        "Materials",
+        "lambert1",
+        "nodegraph"
       ],
       {
         "isExpanded" : true,
@@ -328,23 +121,19 @@
       [
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "Rubber_3_001"
+        "Video_Dock"
       ],
       {
-        "isExpanded" : true,
+        "disallowsFraming" : false,
+        "isExpanded" : false,
         "isLocked" : false
       },
       [
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root",
         "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model",
-        "Leopard_2A6_fbx"
+        "Selectable_Missile_Turret",
+        "Materials"
       ],
       {
         "isExpanded" : true,
@@ -356,7 +145,7 @@
         "Scene",
         "Leopard_2A6_Free",
         "Materials",
-        "Rubber_katok",
+        "material",
         "nodegraph"
       ],
       {
@@ -366,9 +155,9 @@
       [
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root",
-        "Selectable_Missile_Turret",
-        "Materials",
-        "lambert1"
+        "Scene",
+        "Leopard_2A6_Free",
+        "Materials"
       ],
       {
         "isExpanded" : true,
@@ -377,8 +166,7 @@
       [
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root",
-        "Scene",
-        "Leopard_2A6_Free"
+        "Scene"
       ],
       {
         "isExpanded" : true,
@@ -391,6 +179,78 @@
         "Leopard_2A6_Free",
         "Materials",
         "Tank_3_001",
+        "nodegraph"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Leopard_2A6_Free",
+        "Materials",
+        "wire_145028177",
+        "nodegraph"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Leopard_2A6_Free",
+        "Materials",
+        "red_light",
+        "nodegraph"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Missile_Turret",
+        "Materials"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Leopard_2A6_Free",
+        "Materials",
+        "material_5",
+        "nodegraph"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Material"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
+        "Root",
+        "Scene",
+        "Leopard_2A6_Free",
+        "Materials",
+        "material_3",
         "nodegraph"
       ],
       {
@@ -416,18 +276,8 @@
         "Scene",
         "Leopard_2A6_Free",
         "Materials",
-        "orange_light"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes"
+        "Rubber_katok",
+        "nodegraph"
       ],
       {
         "isExpanded" : true,
@@ -448,182 +298,10 @@
       },
       [
         "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Selectable_Missile_Turret",
-        "Materials",
-        "lambert1",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "material",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model",
-        "Leopard_2A6_fbx",
-        "RootNode",
-        "Box72"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "Rubber_3_001",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "wire_145028177",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "wheel_red"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "SkyDome"
-      ],
-      {
-        "disallowsFraming" : true,
-        "isExpanded" : false,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "orange_light",
-        "nodegraph"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "wire_145028177"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
         "Root"
       ],
       {
         "disallowsFraming" : false,
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Materials",
-        "Tank_3_001"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "C6A7F375-BFE9-46E0-9EA6-1A6B150F43FD",
-        "Root",
-        "Scene",
-        "Leopard_2A6_Free",
-        "Meshes",
-        "Sketchfab_model",
-        "Leopard_2A6_fbx",
-        "RootNode",
-        "Up1"
-      ],
-      {
         "isExpanded" : true,
         "isLocked" : false
       }

@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/.build/index-build/arm64-apple-macosx/debug/RealityKitContent.build/master.swiftdeps"
+  },
+  "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/Sources/RealityKitContent/RealityKitContent.swift": {
+    "dependencies": "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/.build/index-build/arm64-apple-macosx/debug/RealityKitContent.build/RealityKitContent.d",
+    "object": "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/.build/index-build/arm64-apple-macosx/debug/RealityKitContent.build/RealityKitContent.swift.o",
+    "swiftmodule": "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/.build/index-build/arm64-apple-macosx/debug/RealityKitContent.build/RealityKitContent~partial.swiftmodule",
+    "swift-dependencies": "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/.build/index-build/arm64-apple-macosx/debug/RealityKitContent.build/RealityKitContent.swiftdeps",
+    "diagnostics": "/Users/yejunpark/Desktop/ssk/MarkerSync/Packages/RealityKitContent/.build/index-build/arm64-apple-macosx/debug/RealityKitContent.build/RealityKitContent.dia"
+  }
+}
