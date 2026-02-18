@@ -46,6 +46,7 @@ class ARManager {
     var selectedTankColor: TankColor = .desertTan
     var selectedTankOptions = TankOptions()
     var tankScale: Float = 0.1
+    var tankRotation: Float = 0
     var selectableMeshItems: [SelectableMeshItem] = []
     var selectableMeshVisibilityByKey: [String: Bool] = [:]
 
@@ -408,6 +409,7 @@ class ARManager {
         isWallSelectionCompleted = false
         isMarkerTrackingActive = false
         tankScale = 0.1
+        tankRotation = 0
         
         // 샘플링 상태 초기화
         resetSampling()

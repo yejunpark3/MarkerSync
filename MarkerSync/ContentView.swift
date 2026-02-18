@@ -590,6 +590,14 @@ struct ViewingModelView: View {
                         isEnabled: true
                     )
 
+                    RotationControlView(
+                        rotation: Binding(
+                            get: { arManager.tankRotation },
+                            set: { arManager.tankRotation = $0 }
+                        ),
+                        isEnabled: true
+                    )
+
                     Divider()
 
                     SelectableMeshToggleList(

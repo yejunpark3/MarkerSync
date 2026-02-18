@@ -95,3 +95,34 @@ enum TankScaleConfig {
         return "\(Int((meters * 100).rounded()))cm"
     }
 }
+
+enum TankRotationPreset: Float, CaseIterable {
+    case zero = 0
+    case quarter = 90
+    case half = 180
+    case threeQuarter = 270
+
+    var label: String {
+        switch self {
+        case .zero: return "0°"
+        case .quarter: return "90°"
+        case .half: return "180°"
+        case .threeQuarter: return "270°"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .zero: return "arrow.up"
+        case .quarter: return "arrow.right"
+        case .half: return "arrow.down"
+        case .threeQuarter: return "arrow.left"
+        }
+    }
+}
+
+enum TankRotationConfig {
+    static let minDegrees: Float = 0
+    static let maxDegrees: Float = 359
+    static let animationDuration: TimeInterval = 0.3
+}

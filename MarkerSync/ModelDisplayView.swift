@@ -59,9 +59,13 @@ struct ModelDisplayView: View {
         .onChange(of: selectedAnchorId) { _, _ in
             refreshSelectableMeshItemsForSelectedAnchor()
             applyTankScale(arManager.tankScale, animated: false)
+            applyTankRotation(arManager.tankRotation, animated: false)
         }
         .onChange(of: arManager.tankScale) { _, newScale in
             applyTankScale(newScale, animated: true)
+        }
+        .onChange(of: arManager.tankRotation) { _, newRotation in
+            applyTankRotation(newRotation, animated: true)
         }
         .onChange(of: arManager.selectableMeshItems) { _, items in
             applySelectableMeshVisibilityForSelectedAnchor(items)
@@ -230,6 +234,7 @@ struct ModelDisplayView: View {
                 model.position = .zero
                 model.name = "k2_tank_model"
                 model.scale = SIMD3<Float>(repeating: min(max(arManager.tankScale, TankScaleConfig.minScale), TankScaleConfig.maxScale))
+                model.transform.rotation = simd_quatf(angle: arManager.tankRotation * .pi / 180, axis: [0, 1, 0])
                 
                 container.addChild(model)
                 applyXRayParameters(to: container)
@@ -472,6 +477,29 @@ struct ModelDisplayView: View {
         }
 
         repositionExplanationAfterScale(animated: animated, scale: clampedScale)
+    }
+
+    private func applyTankRotation(_ degrees: Float, animated: Bool) {
+        guard let anchorId = selectedAnchorId,
+              let tankContainer = modelEntities[anchorId],
+              let modelEntity = tankContainer.findEntity(named: "k2_tank_model") else {
+            return
+        }
+
+        let radians = degrees * .pi / 180
+        var updatedTransform = modelEntity.transform
+        updatedTransform.rotation = simd_quatf(angle: radians, axis: [0, 1, 0])
+
+        if animated {
+            modelEntity.move(
+                to: updatedTransform,
+                relativeTo: modelEntity.parent,
+                duration: TankRotationConfig.animationDuration,
+                timingFunction: .easeInOut
+            )
+        } else {
+            modelEntity.transform = updatedTransform
+        }
     }
 
     private func repositionExplanationAfterScale(animated: Bool, scale: Float? = nil) {
