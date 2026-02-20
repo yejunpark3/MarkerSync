@@ -223,27 +223,34 @@ struct ModelDisplayView: View {
             
             do {
                 print("📦 Loading model for anchor: \(anchorId)")
-                
+
+                // Capture scale/rotation before await to avoid race with user changes
+                let capturedScale = clampTankScale(arManager.tankScale)
+                let capturedRotation = arManager.tankRotation
+
                 // 컨테이너 Entity 생성
                 let container = Entity()
                 container.transform = Transform(matrix: anchorInfo.anchor.originFromAnchorTransform)
                 container.name = "anchor_container_\(anchorId.uuidString)"
-                
+
                 // 3D 모델 로드
                 let model = try await Entity(named: "Immersive", in: realityKitContentBundle)
                 model.position = .zero
                 model.name = "k2_tank_model"
-                model.scale = SIMD3<Float>(repeating: min(max(arManager.tankScale, TankScaleConfig.minScale), TankScaleConfig.maxScale))
-                model.transform.rotation = simd_quatf(angle: arManager.tankRotation * .pi / 180, axis: [0, 1, 0])
-                
+                model.scale = SIMD3<Float>(repeating: capturedScale)
+                model.transform.rotation = simd_quatf(angle: capturedRotation * .pi / 180, axis: [0, 1, 0])
+
                 container.addChild(model)
                 applyXRayParameters(to: container)
 
                 // Calculate entity height for dynamic positioning
+                // Divide by captured scale to store the unscaled base height,
+                // since visualBounds already reflects the current scale.
                 if let modelEntity = container.findEntity(named: "k2_tank_model"),
                    let height = calculateEntityHeight(modelEntity) {
-                    entityHeights[anchorId] = height
-                    print("✅ Cached height \(height)m for anchor: \(anchorId)")
+                    let unscaledHeight = height / capturedScale
+                    entityHeights[anchorId] = unscaledHeight
+                    print("✅ Cached unscaled height \(unscaledHeight)m (measured \(height)m at scale \(capturedScale)) for anchor: \(anchorId)")
                 } else {
                     print("⚠️ Could not calculate height, will use fallback positioning")
                 }
@@ -509,9 +516,9 @@ struct ModelDisplayView: View {
             return
         }
 
-        let baseHeight = entityHeights[anchorId] ?? 0.7
+        let unscaledHeight = entityHeights[anchorId] ?? 7.0
         let currentScale = scale ?? clampTankScale(arManager.tankScale)
-        let targetY = baseHeight * currentScale * 1.2
+        let targetY = unscaledHeight * currentScale * 1.2
 
         var updatedTransform = explanationEntity.transform
         updatedTransform.translation = SIMD3<Float>(0, targetY, 0)
@@ -531,13 +538,13 @@ struct ModelDisplayView: View {
     private func configureExplanationAttachment(_ attachment: Entity, height: Float? = nil) {
         attachment.name = "explanationWindow"
 
-        let baseHeight = height ?? 0.7  // fallback to original value
+        let unscaledHeight = height ?? 7.0  // fallback unscaled height
         let currentScale = clampTankScale(arManager.tankScale)
-        attachment.position = [0, baseHeight * currentScale * 1.2, 0]
+        attachment.position = [0, unscaledHeight * currentScale * 1.2, 0]
 
         attachment.components.set(BillboardComponent())
 
-        print("📍 Explanation window positioned at y=\(baseHeight * currentScale * 1.2)m")
+        print("📍 Explanation window positioned at y=\(unscaledHeight * currentScale * 1.2)m")
     }
 
     private func calculateEntityHeight(_ entity: Entity) -> Float? {
