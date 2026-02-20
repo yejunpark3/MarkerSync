@@ -598,6 +598,15 @@ struct ViewingModelView: View {
                         isEnabled: true
                     )
 
+                    Toggle(isOn: Binding(
+                        get: { arManager.showPartBillboards },
+                        set: { arManager.showPartBillboards = $0 }
+                    )) {
+                        Label("부위 설명 표시", systemImage: "tag.fill")
+                            .font(.caption)
+                    }
+                    .padding(.horizontal, 4)
+
                     Divider()
 
                     SelectableMeshToggleList(

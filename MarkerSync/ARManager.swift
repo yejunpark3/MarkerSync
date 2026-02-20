@@ -47,6 +47,7 @@ class ARManager {
     var selectedTankOptions = TankOptions()
     var tankScale: Float = 0.1
     var tankRotation: Float = 0
+    var showPartBillboards: Bool = false
     var selectableMeshItems: [SelectableMeshItem] = []
     var selectableMeshVisibilityByKey: [String: Bool] = [:]
 
@@ -410,6 +411,7 @@ class ARManager {
         isMarkerTrackingActive = false
         tankScale = 0.1
         tankRotation = 0
+        showPartBillboards = false
         
         // 샘플링 상태 초기화
         resetSampling()

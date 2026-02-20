@@ -40,6 +40,13 @@ struct ModelDisplayView: View {
                         TankExplanationView()
                     }
                 }
+                ForEach(TankPartRegistry.all) { part in
+                    Attachment(id: "partBillboard_\(part.id)") {
+                        if arManager.showPartBillboards {
+                            TankPartBillboardView(part: part)
+                        }
+                    }
+                }
             }
 
             // REMOVED: GestureControlPanelView() - Integrated into main RealityView
@@ -66,6 +73,9 @@ struct ModelDisplayView: View {
         }
         .onChange(of: arManager.tankRotation) { _, newRotation in
             applyTankRotation(newRotation, animated: true)
+        }
+        .onChange(of: arManager.showPartBillboards) { _, show in
+            updatePartBillboardVisibility(show)
         }
         .onChange(of: arManager.selectableMeshItems) { _, items in
             applySelectableMeshVisibilityForSelectedAnchor(items)
@@ -210,6 +220,11 @@ struct ModelDisplayView: View {
                 tankContainer.addChild(explanationAttachment)
                 configureExplanationAttachment(explanationAttachment, height: cachedHeight)
             }
+        }
+
+        // Part billboards - attach to tankContainer (same as explanationWindow)
+        if let tankContainer = modelEntities[anchorId] {
+            attachPartBillboards(to: tankContainer, attachments: attachments)
         }
     }
     
@@ -484,6 +499,7 @@ struct ModelDisplayView: View {
         }
 
         repositionExplanationAfterScale(animated: animated, scale: clampedScale)
+        repositionPartBillboards(animated: animated)
     }
 
     private func applyTankRotation(_ degrees: Float, animated: Bool) {
@@ -507,6 +523,8 @@ struct ModelDisplayView: View {
         } else {
             modelEntity.transform = updatedTransform
         }
+
+        repositionPartBillboards(animated: animated)
     }
 
     private func repositionExplanationAfterScale(animated: Bool, scale: Float? = nil) {
@@ -560,8 +578,143 @@ struct ModelDisplayView: View {
         return height
     }
 
+    // MARK: - Part Billboards
+
+    /// Returns the tankContainer for the selected anchor.
+    private func selectedTankContainer() -> Entity? {
+        guard let anchorId = selectedAnchorId else { return nil }
+        return modelEntities[anchorId]
+    }
+
+    /// Attaches billboard ViewAttachmentEntities and connector lines to tankContainer.
+    /// Safe to call repeatedly - uses name-guard to prevent duplicates.
+    /// Called from the RealityView update: closure — does NOT modify @State.
+    private func attachPartBillboards(to tankContainer: Entity, attachments: RealityViewAttachments) {
+        let currentScale = clampTankScale(arManager.tankScale)
+        let rotationDegrees = arManager.tankRotation
+
+        for part in TankPartRegistry.all {
+            let billboardName = "partBillboard_\(part.id)"
+            let lineName = "partLine_\(part.id)"
+
+            // Billboard attachment
+            if let billboardEntity = attachments.entity(for: billboardName),
+               !tankContainer.children.contains(where: { $0.name == billboardName }) {
+                billboardEntity.name = billboardName
+                let billboardPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+                billboardEntity.position = billboardPos
+                billboardEntity.components.set(BillboardComponent())
+                billboardEntity.isEnabled = arManager.showPartBillboards
+                tankContainer.addChild(billboardEntity)
+            }
+
+            // Connector line
+            if !tankContainer.children.contains(where: { $0.name == lineName }) {
+                let startPos = modelToContainerPosition(part.localPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+                let endPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+                let lineEntity = makeConnectorLine(from: startPos, to: endPos)
+                lineEntity.name = lineName
+                lineEntity.isEnabled = arManager.showPartBillboards
+                tankContainer.addChild(lineEntity)
+            }
+        }
+    }
+
+    /// Shows or hides all part billboard and line entities.
+    private func updatePartBillboardVisibility(_ show: Bool) {
+        guard let tankContainer = selectedTankContainer() else { return }
+        for part in TankPartRegistry.all {
+            tankContainer.findEntity(named: "partBillboard_\(part.id)")?.isEnabled = show
+            tankContainer.findEntity(named: "partLine_\(part.id)")?.isEnabled = show
+        }
+        if show {
+            repositionPartBillboards(animated: false)
+        }
+    }
+
+    /// Repositions billboards and lines when scale or rotation changes.
+    private func repositionPartBillboards(animated: Bool) {
+        guard let tankContainer = selectedTankContainer() else { return }
+
+        let currentScale = clampTankScale(arManager.tankScale)
+        let rotationDegrees = arManager.tankRotation
+        let duration = animated ? TankScaleConfig.animationDuration : 0
+
+        for part in TankPartRegistry.all {
+            let billboardPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+            let startPos = modelToContainerPosition(part.localPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+
+            // Reposition billboard
+            if let billboardEntity = tankContainer.findEntity(named: "partBillboard_\(part.id)") {
+                if animated {
+                    var transform = billboardEntity.transform
+                    transform.translation = billboardPos
+                    billboardEntity.move(to: transform, relativeTo: billboardEntity.parent, duration: duration, timingFunction: .easeInOut)
+                } else {
+                    billboardEntity.position = billboardPos
+                }
+            }
+
+            // Recreate line with new geometry
+            let lineName = "partLine_\(part.id)"
+            if let oldLine = tankContainer.findEntity(named: lineName) {
+                let wasEnabled = oldLine.isEnabled
+                oldLine.removeFromParent()
+
+                let newLine = makeConnectorLine(from: startPos, to: billboardPos)
+                newLine.name = lineName
+                newLine.isEnabled = wasEnabled
+                tankContainer.addChild(newLine)
+            }
+        }
+    }
+
+    /// Converts a position in k2_tank_model local space to tankContainer space.
+    /// Applies scale and Y-axis rotation.
+    private func modelToContainerPosition(_ localPos: SIMD3<Float>, scale: Float, rotationDegrees: Float) -> SIMD3<Float> {
+        let scaled = localPos * scale
+        let radians = rotationDegrees * .pi / 180
+        let cosA = cos(radians)
+        let sinA = sin(radians)
+        return SIMD3<Float>(
+            scaled.x * cosA + scaled.z * sinA,
+            scaled.y,
+            -scaled.x * sinA + scaled.z * cosA
+        )
+    }
+
+    /// Creates a white line entity between two points in container space.
+    private func makeConnectorLine(from start: SIMD3<Float>, to end: SIMD3<Float>) -> ModelEntity {
+        let diff = end - start
+        let length = simd_length(diff)
+        guard length > 0.001 else { return ModelEntity() }
+
+        let thickness: Float = 0.002
+        let mesh = MeshResource.generateBox(
+            width: thickness,
+            height: length,
+            depth: thickness
+        )
+        let line = ModelEntity(mesh: mesh, materials: [SimpleMaterial(color: .white, isMetallic: false)])
+        line.position = (start + end) / 2
+
+        // Rotate box Y-axis to align with direction
+        let up = SIMD3<Float>(0, 1, 0)
+        let direction = simd_normalize(diff)
+        let dot = simd_dot(up, direction)
+        if dot < -0.9999 {
+            // Anti-parallel: rotate 180° around X
+            line.orientation = simd_quatf(angle: .pi, axis: SIMD3<Float>(1, 0, 0))
+        } else if dot < 0.9999 {
+            line.orientation = simd_quatf(from: up, to: direction)
+        }
+        // else: nearly parallel to up, identity is correct
+
+        return line
+    }
+
     // MARK: - Debug Helpers
-    
+
     private func addDebugReferenceObjects(to content: RealityViewContent) {
         // 녹색 구 - 사용자 앞 1m, 눈높이
         let sphere = ModelEntity(
