@@ -597,11 +597,14 @@ struct ModelDisplayView: View {
             let billboardName = "partBillboard_\(part.id)"
             let lineName = "partLine_\(part.id)"
 
-            // Billboard attachment
+            // Billboard attachment — lifted slightly above the line endpoint
+            // so the line visually connects near the card's bottom edge.
+            let billboardLift: Float = 0.075
             if let billboardEntity = attachments.entity(for: billboardName),
                !tankContainer.children.contains(where: { $0.name == billboardName }) {
                 billboardEntity.name = billboardName
-                let billboardPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+                var billboardPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+                billboardPos.y += billboardLift
                 billboardEntity.position = billboardPos
                 billboardEntity.components.set(BillboardComponent())
                 billboardEntity.isEnabled = arManager.showPartBillboards
@@ -640,8 +643,11 @@ struct ModelDisplayView: View {
         let rotationDegrees = arManager.tankRotation
         let duration = animated ? TankScaleConfig.animationDuration : 0
 
+        let billboardLift: Float = 0.075
         for part in TankPartRegistry.all {
-            let billboardPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+            let lineEndPos = modelToContainerPosition(part.billboardPosition, scale: currentScale, rotationDegrees: rotationDegrees)
+            var billboardPos = lineEndPos
+            billboardPos.y += billboardLift
             let startPos = modelToContainerPosition(part.localPosition, scale: currentScale, rotationDegrees: rotationDegrees)
 
             // Reposition billboard
@@ -661,7 +667,7 @@ struct ModelDisplayView: View {
                 let wasEnabled = oldLine.isEnabled
                 oldLine.removeFromParent()
 
-                let newLine = makeConnectorLine(from: startPos, to: billboardPos)
+                let newLine = makeConnectorLine(from: startPos, to: lineEndPos)
                 newLine.name = lineName
                 newLine.isEnabled = wasEnabled
                 tankContainer.addChild(newLine)
