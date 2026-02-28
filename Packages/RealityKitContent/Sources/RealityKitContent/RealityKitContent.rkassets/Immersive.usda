@@ -7,12 +7,12 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Scene", "Selectable_Missile_Turret"]
+    reorder nameChildren = ["Scene", "Cube", "MaterialLibrary"]
     def "Scene" (
         references = @Scene.usdz@
     )
     {
-        reorder nameChildren = ["Material", "Selectable_Missile_Turret", "Leopard_2A6_Free"]
+        reorder nameChildren = ["Cube", "Material", "Selectable_Missile_Turret", "Leopard_2A6_Free"]
         float3 xformOp:scale = (1, 1, 1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
@@ -4710,6 +4710,87 @@ def Xform "Root"
             {
                 rel group = </Root/Model_Sorting_Group>
                 uniform token info:id = "RealityKit.MeshSorting"
+            }
+        }
+
+        def Cube "Cube" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </Root/MaterialLibrary/Cube_Holder_Red/DefaultMaterial> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+            double size = 0.2
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (1, 1, 1)
+            float3 xformOp:translate = (0, 0.65, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+    }
+
+    def Xform "MaterialLibrary"
+    {
+        reorder nameChildren = ["Cube_Holder_Red", "Cube_Holder_Blue"]
+        def Cube "Cube_Holder_Red" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </Root/MaterialLibrary/Cube_Holder_Red/DefaultMaterial>
+            double size = 0
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (1, 1, 1)
+            float3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def Material "DefaultMaterial"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                token outputs:surface.connect = </Root/MaterialLibrary/Cube_Holder_Red/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                def Shader "DefaultSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (1, 0.14913142, 0) (
+                        colorSpace = "srgb_texture"
+                    )
+                    float inputs:roughness = 0.75
+                    token outputs:surface
+                }
+            }
+        }
+
+        def Cube "Cube_Holder_Blue" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </Root/MaterialLibrary/Cube_Holder_Blue/DefaultMaterial>
+            double size = 0
+            float2 ui:nodegraph:node:pos = (20, 20)
+            int ui:nodegraph:node:stackingOrder = 1
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (1, 1, 1)
+            float3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def Material "DefaultMaterial"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                token outputs:surface.connect = </Root/MaterialLibrary/Cube_Holder_Blue/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                def Shader "DefaultSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (0.016804177, 0.198351, 1) (
+                        colorSpace = "srgb_texture"
+                    )
+                    float inputs:roughness = 0.75
+                    token outputs:surface
+                }
             }
         }
     }

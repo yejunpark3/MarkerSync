@@ -43,7 +43,7 @@ class ARManager {
     var anchorToWallIDs: [UUID: [UUID]] = [:]
 
     // MARK: - Tank Customization State
-    var selectedTankColor: TankColor = .desertTan
+    var selectedTankColor: TankColor = .red
     var selectedTankOptions = TankOptions()
     var tankScale: Float = 0.1
     var tankRotation: Float = 0
@@ -396,6 +396,7 @@ class ARManager {
         subscriptions.removeAll()
         
         // 상태 초기화
+        selectedTankColor = .red
         sharedAnchors.removeAll()
         anchorEntities.removeAll()
         isConnected = false

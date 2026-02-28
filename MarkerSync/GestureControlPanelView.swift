@@ -16,7 +16,7 @@ struct GestureControlPanelView: View {
     @Environment(ARManager.self) var arManager
     @State private var currentHandTransform: simd_float4x4?
     @State private var isGestureActive = false
-    @State private var selectedColor: TankColor = .desertTan
+    @State private var selectedColor: TankColor = .red
     @State private var selectedOptions = TankOptions()
 
     var body: some View {

@@ -61,13 +61,13 @@ struct ControlPanelView: View {
         HStack(spacing: 40) {
             ControlPanelView(
                 isHost: true,
-                currentColor: .constant(.desertTan),
+                currentColor: .constant(.red),
                 currentOptions: .constant(TankOptions())
             )
 
             ControlPanelView(
                 isHost: false,
-                currentColor: .constant(.forestGreen),
+                currentColor: .constant(.blue),
                 currentOptions: .constant(TankOptions())
             )
         }

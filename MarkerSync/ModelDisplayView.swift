@@ -21,6 +21,7 @@ struct ModelDisplayView: View {
     @State private var entityHeights: [UUID: Float] = [:]
     @State private var selectableEntitiesByAnchor: [UUID: [String: Entity]] = [:]
     @State private var selectableItemsByAnchor: [UUID: [SelectableMeshItem]] = [:]
+    @State private var materialCacheByAnchor: [UUID: [String: [String: [any RealityKit.Material]]]] = [:]
 
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
@@ -67,6 +68,11 @@ struct ModelDisplayView: View {
             refreshSelectableMeshItemsForSelectedAnchor()
             applyTankScale(arManager.tankScale, animated: false)
             applyTankRotation(arManager.tankRotation, animated: false)
+        }
+        .onChange(of: arManager.selectedTankColor) { _, newColor in
+            if let anchorId = selectedAnchorId {
+                applyTankColor(newColor, for: anchorId)
+            }
         }
         .onChange(of: arManager.tankScale) { _, newScale in
             applyTankScale(newScale, animated: true)
@@ -228,6 +234,76 @@ struct ModelDisplayView: View {
         }
     }
     
+    // MARK: - Material Cache & Color
+
+    private func buildMaterialCache(from root: Entity) -> [String: [String: [any RealityKit.Material]]] {
+        var cache: [String: [String: [any RealityKit.Material]]] = [:]
+
+        // MaterialLibrary 탐색
+        guard let materialLibrary = root.findEntity(named: "MaterialLibrary") else {
+            print("⚠️ MaterialLibrary not found")
+            return cache
+        }
+
+        // 전체 Holder 탐색 (자식 또는 손자 위치 가능하므로 재귀 탐색)
+        func traverseForHolders(entity: Entity) {
+            let name = entity.name
+            if name.contains("_Holder_") {
+                let components = name.components(separatedBy: "_Holder_")
+                if components.count == 2 {
+                    let entityName = components[0]
+                    let colorName = components[1]
+
+                    if let modelComp = entity.components[ModelComponent.self] as? ModelComponent {
+                        if cache[entityName] == nil {
+                            cache[entityName] = [:]
+                        }
+                        cache[entityName]?[colorName] = modelComp.materials
+                        print("📦 Cached material: \(entityName) - \(colorName)")
+                    }
+                }
+            }
+
+            for child in entity.children {
+                traverseForHolders(entity: child)
+            }
+        }
+
+        traverseForHolders(entity: materialLibrary)
+        
+        // 런타임 비표시
+        materialLibrary.isEnabled = false
+        print("🙈 MaterialLibrary hidden")
+
+        return cache
+    }
+
+    private func applyTankColor(_ color: TankColor, for anchorId: UUID) {
+        guard let container = modelEntities[anchorId],
+              let cache = materialCacheByAnchor[anchorId] else { return }
+
+        let colorRawValue = color.rawValue
+
+        func traverseAndApply(entity: Entity) {
+            let name = entity.name
+            if let entityCache = cache[name], let materials = entityCache[colorRawValue] {
+                if var modelComp = entity.components[ModelComponent.self] as? ModelComponent {
+                    modelComp.materials = materials
+                    entity.components.set(modelComp)
+                }
+            }
+
+            for child in entity.children {
+                traverseAndApply(entity: child)
+            }
+        }
+
+        traverseAndApply(entity: container)
+        
+        // 새 Material에 XRay 효과를 유지하기 위해 다시 파라미터 적용
+        applyXRayParameters(to: container)
+    }
+    
     private func loadModel(for anchorId: UUID, anchorInfo: SharedAnchorInfo, content: RealityViewContent) {
         // 중복 로드 방지
         guard !isLoadingModel else { return }
@@ -256,7 +332,13 @@ struct ModelDisplayView: View {
                 model.transform.rotation = simd_quatf(angle: capturedRotation * .pi / 180, axis: [0, 1, 0])
 
                 container.addChild(model)
-                applyXRayParameters(to: container)
+
+                // Register before applying color so initial color update can find this container.
+                modelEntities[anchorId] = container
+
+                let cache = buildMaterialCache(from: model)
+                materialCacheByAnchor[anchorId] = cache
+                applyTankColor(arManager.selectedTankColor, for: anchorId)
 
                 // Calculate entity height for dynamic positioning
                 // Divide by captured scale to store the unscaled base height,
@@ -280,7 +362,6 @@ struct ModelDisplayView: View {
                 content.add(container)
                 
                 // 로컬 및 ARManager에 등록 (Drift 보정용)
-                modelEntities[anchorId] = container
                 arManager.registerEntity(container, for: anchorId)
 
                 // Selectable_ 메쉬 목록 생성 및 가시성 복원
@@ -329,6 +410,7 @@ struct ModelDisplayView: View {
             entityHeights.removeAll()
             selectableEntitiesByAnchor.removeAll()
             selectableItemsByAnchor.removeAll()
+            materialCacheByAnchor.removeAll()
             arManager.setSelectableMeshes([])
 
             if !arManager.sharedAnchors.isEmpty {
@@ -399,6 +481,7 @@ struct ModelDisplayView: View {
         entityHeights.removeAll()
         selectableEntitiesByAnchor.removeAll()
         selectableItemsByAnchor.removeAll()
+        materialCacheByAnchor.removeAll()
         arManager.setSelectableMeshes([])
     }
 

@@ -108,7 +108,7 @@ struct SelectableMeshToggleList: View {
         Color.black.ignoresSafeArea()
 
         ColorPickerGrid(
-            selection: .constant(.desertTan),
+            selection: .constant(.red),
             colors: TankColor.allCases,
             isEnabled: true
         )
