@@ -4320,6 +4320,7 @@ def Xform "Root"
 
         def "Selectable_Missile_Turret" (
             active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
             customData = {
                 float3 rotationEulerHint = (2.3841858e-7, 3.1415927, 0)
             }
@@ -4335,6 +4336,14 @@ def Xform "Root"
             {
                 over "lambert1"
                 {
+                    asset inputs:Camo_BaseColorTex = @lambert1_baseColor.jpg@ (
+                        customData = {
+                            dictionary realitykit = {
+                                float2 positionInSubgraph = (-460.51242, 1709.353)
+                                int stackingOrderInSubgraph = 1043
+                            }
+                        }
+                    )
                     float inputs:InsideAlpha = 0 (
                         customData = {
                             dictionary realitykit = {
@@ -4405,18 +4414,6 @@ def Xform "Root"
                         int ui:nodegraph:node:stackingOrder = 925
                     }
 
-                    def Shader "image"
-                    {
-                        uniform token info:id = "ND_image_color3"
-                        asset inputs:file = @lambert1_baseColor.jpg@
-                        string inputs:filtertype
-                        string inputs:uaddressmode
-                        string inputs:vaddressmode
-                        color3f outputs:out
-                        float2 ui:nodegraph:node:pos = (108, 2552)
-                        int ui:nodegraph:node:stackingOrder = 921
-                    }
-
                     def Shader "image_5"
                     {
                         uniform token info:id = "ND_image_vector3"
@@ -4464,10 +4461,11 @@ def Xform "Root"
                             customData = {
                                 dictionary realitykit = {
                                     float2 positionInSubgraph = (1360, 654.9375)
+                                    int stackingOrderInSubgraph = 1056
                                 }
                             }
                         )
-                        color3f inputs:Mix_1_fg.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/image.outputs:out>
+                        color3f inputs:Mix_1_fg.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/Image.outputs:out>
                         color3f inputs:PreviewSurface_emissiveColor (
                             customData = {
                                 dictionary realitykit = {
@@ -4509,8 +4507,9 @@ def Xform "Root"
                         )
                         float inputs:PreviewSurface_roughness.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/image_4.outputs:out>
                         token outputs:PreviewSurface_out.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1/nodegraph/PreviewSurface.outputs:out>
-                        float2 ui:nodegraph:node:pos = (388.5, 1844.125)
-                        int ui:nodegraph:node:stackingOrder = 974
+                        float2 ui:nodegraph:node:pos = (396.33267, 1845.16)
+                        int ui:nodegraph:node:stackingOrder = 1045
+                        string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["inputs:Mix_1_fg"]
                         float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (2129.25, 1004.4375)
 
                         def Shader "PreviewSurface" (
@@ -4689,6 +4688,18 @@ def Xform "Root"
                             float2 ui:nodegraph:node:pos = (596, 82.5)
                             int ui:nodegraph:node:stackingOrder = 1054
                         }
+                    }
+
+                    def Shader "Image"
+                    {
+                        uniform token info:id = "ND_image_color3"
+                        color3f inputs:default
+                        asset inputs:file.connect = </Root/Scene/Selectable_Missile_Turret/Materials/lambert1.inputs:Camo_BaseColorTex>
+                        string inputs:filtertype
+                        float2 inputs:texcoord
+                        color3f outputs:out
+                        float2 ui:nodegraph:node:pos = (-211.96758, 1779.6091)
+                        int ui:nodegraph:node:stackingOrder = 1043
                     }
                 }
             }

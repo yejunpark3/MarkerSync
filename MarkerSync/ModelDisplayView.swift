@@ -22,6 +22,8 @@ struct ModelDisplayView: View {
     @State private var selectableEntitiesByAnchor: [UUID: [String: Entity]] = [:]
     @State private var selectableItemsByAnchor: [UUID: [SelectableMeshItem]] = [:]
     @State private var materialCacheByAnchor: [UUID: [String: [String: [any RealityKit.Material]]]] = [:]
+    @State private var camoTextureCache: [String: TextureResource] = [:]
+    @State private var camoRequestVersionByAnchor: [UUID: Int] = [:]
 
     // MARK: - Debug Manager
     @State private var debugManager = DebugElementManager()
@@ -278,30 +280,152 @@ struct ModelDisplayView: View {
         return cache
     }
 
-    private func applyTankColor(_ color: TankColor, for anchorId: UUID) {
-        guard let container = modelEntities[anchorId],
-              let cache = materialCacheByAnchor[anchorId] else { return }
+    private func camoBaseColorTextureName(entityKey: String, color: TankColor) -> String {
+        "\(entityKey)_Camo_\(color.rawValue)_BaseColor"
+    }
 
-        let colorRawValue = color.rawValue
+    private func applyCamoTextureRecursive(
+        entity: Entity,
+        texture: TextureResource
+    ) -> Int {
+        var appliedCount = 0
 
-        func traverseAndApply(entity: Entity) {
-            let name = entity.name
-            if let entityCache = cache[name], let materials = entityCache[colorRawValue] {
-                if var modelComp = entity.components[ModelComponent.self] as? ModelComponent {
-                    modelComp.materials = materials
-                    entity.components.set(modelComp)
+        if var modelComponent = entity.components[ModelComponent.self] {
+            var updatedMaterials: [any RealityKit.Material] = []
+            var changed = false
+
+            for material in modelComponent.materials {
+                if var shaderMaterial = material as? ShaderGraphMaterial {
+                    do {
+                        try shaderMaterial.setParameter(
+                            name: "Camo_BaseColorTex",
+                            value: .textureResource(texture)
+                        )
+                        updatedMaterials.append(shaderMaterial)
+                        appliedCount += 1
+                        changed = true
+                    } catch {
+                        // Camo_BaseColorTex 파라미터 없는 머티리얼 → 스킵 (안전장치 2)
+                        updatedMaterials.append(material)
+                    }
+                } else {
+                    updatedMaterials.append(material)
                 }
             }
 
-            for child in entity.children {
-                traverseAndApply(entity: child)
+            if changed {
+                modelComponent.materials = updatedMaterials
+                entity.components[ModelComponent.self] = modelComponent
             }
         }
 
-        traverseAndApply(entity: container)
+        for child in entity.children {
+            appliedCount += applyCamoTextureRecursive(entity: child, texture: texture)
+        }
+
+        return appliedCount
+    }
+
+    private func isCurrentCamoRequest(_ version: Int, for anchorId: UUID) -> Bool {
+        camoRequestVersionByAnchor[anchorId] == version
+    }
+
+    private func applyCamoColor(
+        _ color: TankColor,
+        to entityRoot: Entity,
+        for anchorId: UUID,
+        requestVersion: Int
+    ) async {
+        let entityKey = entityRoot.name
+        let texName = camoBaseColorTextureName(entityKey: entityKey, color: color)
+
+        // 캐시 확인
+        let texture: TextureResource
+        if let cached = camoTextureCache[texName] {
+            texture = cached
+        } else {
+            guard let loaded = try? await TextureResource(named: texName) else {
+                print("⚠️ Missing camo texture: \(texName)")
+                return
+            }
+            camoTextureCache[texName] = loaded
+            texture = loaded
+            print("🎨 Loaded camo texture: \(texName)")
+        }
+
+        guard isCurrentCamoRequest(requestVersion, for: anchorId) else { return }
+
+        // 해당 엔티티 하위만 순회 (안전장치 1)
+        let count = applyCamoTextureRecursive(entity: entityRoot, texture: texture)
+        if count > 0 {
+            print("🎨 Applied Camo_BaseColorTex to \(count) materials in \(entityKey)")
+        }
+    }
+
+    private func collectCamoTargets(from root: Entity) -> [Entity] {
+        var targets: [Entity] = []
+
+        func traverse(entity: Entity) {
+            if entity.name.hasPrefix("Selectable_") {
+                targets.append(entity)
+                // Selectable_ 하위의 Selectable_은 탐색하지 않음 (중복 방지)
+                return
+            }
+            for child in entity.children {
+                traverse(entity: child)
+            }
+        }
+
+        traverse(entity: root)
+        return targets
+    }
+
+    private func applyTankColor(_ color: TankColor, for anchorId: UUID) {
+        guard let container = modelEntities[anchorId] else { return }
+
+        let colorRawValue = color.rawValue
+        let requestVersion = (camoRequestVersionByAnchor[anchorId] ?? 0) + 1
+        camoRequestVersionByAnchor[anchorId] = requestVersion
+
+        // --- 1단계: Holder 기반 Material 스왑 (기존 Cube 등) ---
+        if let cache = materialCacheByAnchor[anchorId] {
+            func traverseAndApply(entity: Entity) {
+                let name = entity.name
+                if let entityCache = cache[name], let materials = entityCache[colorRawValue] {
+                    if var modelComp = entity.components[ModelComponent.self] as? ModelComponent {
+                        modelComp.materials = materials
+                        entity.components.set(modelComp)
+                    }
+                }
+
+                for child in entity.children {
+                    traverseAndApply(entity: child)
+                }
+            }
+
+            traverseAndApply(entity: container)
+        }
         
-        // 새 Material에 XRay 효과를 유지하기 위해 다시 파라미터 적용
-        applyXRayParameters(to: container)
+        // --- 2단계: 엔티티별 Camo 텍스처 스왑 ---
+        // Selectable_ 접두사 엔티티를 카모 적용 대상으로 식별
+        Task { @MainActor in
+            guard isCurrentCamoRequest(requestVersion, for: anchorId) else { return }
+
+            let camoTargets = collectCamoTargets(from: container)
+            for target in camoTargets {
+                guard isCurrentCamoRequest(requestVersion, for: anchorId) else { return }
+                await applyCamoColor(
+                    color,
+                    to: target,
+                    for: anchorId,
+                    requestVersion: requestVersion
+                )
+            }
+
+            // --- 3단계: XRay 파라미터 재적용 ---
+            guard isCurrentCamoRequest(requestVersion, for: anchorId) else { return }
+            applyXRayParameters(to: container)
+        }
     }
     
     private func loadModel(for anchorId: UUID, anchorInfo: SharedAnchorInfo, content: RealityViewContent) {
@@ -411,6 +535,8 @@ struct ModelDisplayView: View {
             selectableEntitiesByAnchor.removeAll()
             selectableItemsByAnchor.removeAll()
             materialCacheByAnchor.removeAll()
+            camoTextureCache.removeAll()
+            camoRequestVersionByAnchor.removeAll()
             arManager.setSelectableMeshes([])
 
             if !arManager.sharedAnchors.isEmpty {
@@ -482,6 +608,8 @@ struct ModelDisplayView: View {
         selectableEntitiesByAnchor.removeAll()
         selectableItemsByAnchor.removeAll()
         materialCacheByAnchor.removeAll()
+        camoTextureCache.removeAll()
+        camoRequestVersionByAnchor.removeAll()
         arManager.setSelectableMeshes([])
     }
 
