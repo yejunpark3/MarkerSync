@@ -535,6 +535,7 @@ struct ViewingModelView: View {
     let anchorsCount: Int
     let userRole: UserRole
     @Environment(ARManager.self) var arManager
+    @Environment(PeerMessagingController<Client<TankCommand>>.self) var clientController
 
     var body: some View {
         VStack(spacing: 16) {
@@ -556,6 +557,14 @@ struct ViewingModelView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+
+                HStack(spacing: 4) {
+                    Image(systemName: "ipad")
+                        .foregroundColor(clientController.connectionState == .connected ? .green : .gray)
+                    Text(clientController.connectionState == .connected ? "iPad 연결됨" : "iPad 대기 중")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Divider()
@@ -567,7 +576,10 @@ struct ViewingModelView: View {
                     ColorPickerGrid(
                         selection: Binding(
                             get: { arManager.selectedTankColor },
-                            set: { arManager.selectedTankColor = $0 }
+                            set: { newValue in
+                                arManager.selectedTankColor = newValue
+                                clientController.send(.tankEvent(.colorChange(newValue)))
+                            }
                         ),
                         colors: TankColor.allCases,
                         isEnabled: true
@@ -577,7 +589,10 @@ struct ViewingModelView: View {
                     OptionsControlView(
                         options: Binding(
                             get: { arManager.selectedTankOptions },
-                            set: { arManager.selectedTankOptions = $0 }
+                            set: { newValue in
+                                arManager.selectedTankOptions = newValue
+                                clientController.send(.tankEvent(.optionsChange(newValue)))
+                            }
                         ),
                         isEnabled: true
                     )
@@ -585,7 +600,10 @@ struct ViewingModelView: View {
                     ScaleControlView(
                         scale: Binding(
                             get: { arManager.tankScale },
-                            set: { arManager.tankScale = $0 }
+                            set: { newValue in
+                                arManager.tankScale = newValue
+                                clientController.send(.tankEvent(.scaleChange(newValue)))
+                            }
                         ),
                         isEnabled: true
                     )
@@ -593,14 +611,20 @@ struct ViewingModelView: View {
                     RotationControlView(
                         rotation: Binding(
                             get: { arManager.tankRotation },
-                            set: { arManager.tankRotation = $0 }
+                            set: { newValue in
+                                arManager.tankRotation = newValue
+                                clientController.send(.tankEvent(.rotationChange(newValue)))
+                            }
                         ),
                         isEnabled: true
                     )
 
                     Toggle(isOn: Binding(
                         get: { arManager.showPartBillboards },
-                        set: { arManager.showPartBillboards = $0 }
+                        set: { newValue in
+                            arManager.showPartBillboards = newValue
+                            clientController.send(.tankEvent(.billboardVisibility(newValue)))
+                        }
                     )) {
                         Label("부위 설명 표시", systemImage: "tag.fill")
                             .font(.caption)
@@ -614,6 +638,7 @@ struct ViewingModelView: View {
                         isEnabled: true,
                         onToggle: { key, isVisible in
                             arManager.setSelectableMeshVisibility(key: key, isVisible: isVisible)
+                            clientController.send(.tankEvent(.meshVisibility(key: key, isVisible: isVisible)))
                         }
                     )
                 }
@@ -632,6 +657,47 @@ struct ViewingModelView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .task {
+            for await message in clientController.incomingMessages {
+                switch message {
+                case .tankEvent(let event):
+                    switch event {
+                    case .colorChange(let color):
+                        arManager.selectedTankColor = color
+                    case .scaleChange(let scale):
+                        arManager.tankScale = scale
+                    case .rotationChange(let rotation):
+                        arManager.tankRotation = rotation
+                    case .optionsChange(let options):
+                        arManager.selectedTankOptions = options
+                    case .billboardVisibility(let isVisible):
+                        arManager.showPartBillboards = isVisible
+                    case .meshVisibility(let key, let isVisible):
+                        arManager.setSelectableMeshVisibility(key: key, isVisible: isVisible)
+                    }
+                default:
+                    break
+                }
+            }
+        }
+        .onChange(of: clientController.connectionState) { _, newState in
+            if newState == .connected {
+                let state = TankState(
+                    color: arManager.selectedTankColor,
+                    scale: arManager.tankScale,
+                    rotation: arManager.tankRotation,
+                    options: arManager.selectedTankOptions,
+                    showBillboards: arManager.showPartBillboards,
+                    meshVisibility: arManager.selectableMeshVisibilityByKey
+                )
+                clientController.send(.stateSync(state))
+
+                let meshItems = arManager.selectableMeshItems.map {
+                    MeshItemInfo(id: $0.id, entityKey: $0.entityKey, displayName: $0.displayName, isVisible: $0.isVisible)
+                }
+                clientController.send(.meshListSync(meshItems))
+            }
+        }
     }
 }
 

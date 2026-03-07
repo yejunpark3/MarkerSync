@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-enum TankColor: String, CaseIterable, Codable {
+enum TankColor: String, CaseIterable, Codable, Sendable, Hashable {
     case red = "Red"
     case blue = "Blue"
 
@@ -31,7 +31,7 @@ enum TankColor: String, CaseIterable, Codable {
     }
 }
 
-struct TankOptions: Codable {
+struct TankOptions: Codable, Sendable, Hashable {
     var aps: Bool = false
     var smokeDischarger: Bool = true
     var minePlow: Bool = false

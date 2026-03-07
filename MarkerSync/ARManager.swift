@@ -4,13 +4,7 @@ import GroupActivities
 import Combine
 import SwiftUI
 
-struct SelectableMeshItem: Identifiable, Equatable {
-    let id: String
-    let entityKey: String
-    let sourceName: String
-    let displayName: String
-    var isVisible: Bool
-}
+
 
 @MainActor
 @Observable

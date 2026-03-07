@@ -23,5 +23,11 @@
 	<string>2D 마커 인식을 위해 카메라 접근이 필요합니다</string>
 	<key>NSSupportsGroupActivities</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_markersync._udp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>iPad 컴패니언 앱과 연결하기 위해 로컬 네트워크 접근이 필요합니다</string>
 </dict>
 </plist>
