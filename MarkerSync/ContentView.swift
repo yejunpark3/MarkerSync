@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PeerToPeerMessaging
 
 struct ContentView: View {
     @Environment(ARManager.self) var arManager
@@ -578,7 +579,7 @@ struct ViewingModelView: View {
                             get: { arManager.selectedTankColor },
                             set: { newValue in
                                 arManager.selectedTankColor = newValue
-                                clientController.send(.tankEvent(.colorChange(newValue)))
+                                Task { await clientController.send(.tankEvent(.colorChange(newValue))) }
                             }
                         ),
                         colors: TankColor.allCases,
@@ -591,7 +592,7 @@ struct ViewingModelView: View {
                             get: { arManager.selectedTankOptions },
                             set: { newValue in
                                 arManager.selectedTankOptions = newValue
-                                clientController.send(.tankEvent(.optionsChange(newValue)))
+                                Task { await clientController.send(.tankEvent(.optionsChange(newValue))) }
                             }
                         ),
                         isEnabled: true
@@ -602,7 +603,7 @@ struct ViewingModelView: View {
                             get: { arManager.tankScale },
                             set: { newValue in
                                 arManager.tankScale = newValue
-                                clientController.send(.tankEvent(.scaleChange(newValue)))
+                                Task { await clientController.send(.tankEvent(.scaleChange(newValue))) }
                             }
                         ),
                         isEnabled: true
@@ -613,7 +614,7 @@ struct ViewingModelView: View {
                             get: { arManager.tankRotation },
                             set: { newValue in
                                 arManager.tankRotation = newValue
-                                clientController.send(.tankEvent(.rotationChange(newValue)))
+                                Task { await clientController.send(.tankEvent(.rotationChange(newValue))) }
                             }
                         ),
                         isEnabled: true
@@ -623,7 +624,7 @@ struct ViewingModelView: View {
                         get: { arManager.showPartBillboards },
                         set: { newValue in
                             arManager.showPartBillboards = newValue
-                            clientController.send(.tankEvent(.billboardVisibility(newValue)))
+                            Task { await clientController.send(.tankEvent(.billboardVisibility(newValue))) }
                         }
                     )) {
                         Label("부위 설명 표시", systemImage: "tag.fill")
@@ -638,7 +639,7 @@ struct ViewingModelView: View {
                         isEnabled: true,
                         onToggle: { key, isVisible in
                             arManager.setSelectableMeshVisibility(key: key, isVisible: isVisible)
-                            clientController.send(.tankEvent(.meshVisibility(key: key, isVisible: isVisible)))
+                            Task { await clientController.send(.tankEvent(.meshVisibility(key: key, isVisible: isVisible))) }
                         }
                     )
                 }
@@ -690,12 +691,12 @@ struct ViewingModelView: View {
                     showBillboards: arManager.showPartBillboards,
                     meshVisibility: arManager.selectableMeshVisibilityByKey
                 )
-                clientController.send(.stateSync(state))
+                Task { await clientController.send(.stateSync(state)) }
 
                 let meshItems = arManager.selectableMeshItems.map {
                     MeshItemInfo(id: $0.id, entityKey: $0.entityKey, displayName: $0.displayName, isVisible: $0.isVisible)
                 }
-                clientController.send(.meshListSync(meshItems))
+                Task { await clientController.send(.meshListSync(meshItems)) }
             }
         }
     }
